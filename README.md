@@ -1,9 +1,3 @@
-AplyEase
-Custom Gem
-
-Show thinking
-Of course. Here is a README.md file that summarizes all the progress we've made on the AplyEase project so far.
-
 AplyEase - AI-Powered Job Application Platform 🚀
 This is a full-stack web application designed to streamline the job application process. This project features a secure backend API built with Java Spring Boot and a responsive, user-friendly frontend created with plain HTML, CSS, and JavaScript.
 
