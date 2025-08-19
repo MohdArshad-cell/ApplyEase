@@ -3,19 +3,723 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome - AplyEase</title>
+    <title>AplyEase - AI-Powered Job Application Platform</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        :root {
+            --accent-green: #25D366; 
+        }
+
+        /* === Hero Section === */
+        .hero-section {
+            padding: 5rem 0 7rem 0;
+            overflow: hidden;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            align-items: center;
+            gap: 4rem;
+        }
+        
+        /* === UPDATED HEADLINE STYLE === */
+        .hero-text h1 {
+            font-size: 4.2rem; /* Reduced font size */
+            font-weight: 700;
+            line-height: 1.2; /* Adjusted for a single line */
+            margin: 0 0 1.5rem 0;
+            max-width: 550px; /* Prevents awkward wrapping on medium screens */
+        }
+        .hero-text h1 .highlight {
+            color: var(--accent-cyan);
+        }
+        
+        .hero-text .subheadline {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin: 1.5rem 0 2.5rem 0;
+            max-width: 500px;
+            line-height: 1.7;
+        }
+        .hero-cta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .btn-whatsapp {
+            background-color: var(--accent-green);
+            color: white;
+            padding: 0.75rem 2rem;
+        }
+        .btn-whatsapp:hover {
+            background-color: #20b858;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        /* Social Proof Section */
+        .social-proof {
+            display: flex;
+            align-items: center;
+            margin-top: 2.5rem;
+            gap: 1rem;
+        }
+        .avatar-group { display: flex; }
+        .avatar-group img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid var(--dark-bg);
+            margin-left: -15px;
+        }
+        .avatar-group img:first-child { margin-left: 0; }
+        .social-proof p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* === Hero Dashboard Card === */
+        /* === Hero Dashboard Card (v3) === */
+.hero-dashboard {
+    /* New background for more contrast */
+    background-color: rgba(22, 28, 49, 0.7); /* Solid, semi-transparent base color */
+    background-image: linear-gradient(135deg, rgba(37, 47, 75, 0.3), rgba(18, 24, 43, 0.1));
+    
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid var(--accent-cyan);
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 246, 255, 0.3), 
+                0 0 40px rgba(0, 246, 255, 0.1);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+        .hero-dashboard::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(225deg, var(--accent-cyan), var(--accent-purple), var(--dark-bg));
+            border-radius: 22px;
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.3;
+        }
+        .dashboard-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .dashboard-row:last-child { margin-bottom: 0; }
+        .dashboard-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-circle svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform: rotate(-90deg);
+        }
+        .score-circle .circle-bg { stroke: var(--border-color); }
+        .score-circle .circle-progress {
+            stroke: var(--accent-cyan);
+            stroke-dasharray: 283;
+            stroke-dashoffset: 56;
+            stroke-linecap: round;
+        }
+        .score-text {
+            color: var(--text-primary);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .score-text span {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .graph-svg { width: 120px; height: 40px; }
+        
+        
+        /* === Dashboard Card Animations & Polish === */
+
+/* This is a modern CSS feature that allows us to animate numbers smoothly */
+@property --num {
+  syntax: '<integer>';
+  initial-value: 0;
+  inherits: false;
+}
+
+/* Keyframes for the number counting up */
+@keyframes countUp {
+  to {
+    --num: 92;
+  }
+}
+
+/* Keyframes for the progress circle filling up */
+@keyframes animateProgress {
+  to {
+    stroke-dashoffset: 56; /* This value is calculated for 92% (283 * (1 - 0.92)) */
+  }
+}
+
+/* Keyframes for the graphs drawing themselves */
+@keyframes animateGraph {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* --- Applying the Animations --- */
+
+/* Add a transition and a hover effect to the main card */
+.hero-dashboard {
+    /* ... keep all existing styles for this class ... */
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hero-dashboard:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 0 30px rgba(0, 246, 255, 0.5), 
+                0 0 60px rgba(0, 246, 255, 0.2);
+}
+
+
+/* Make the circle's progress bar start empty and animate in */
+.score-circle .circle-progress {
+    stroke-dashoffset: 283; /* Start at 100% offset (empty) */
+    /* Animation: name duration delay timing-function fill-mode */
+    animation: animateProgress 1.5s 0.5s ease-out forwards;
+}
+
+/* Animate the number counting up */
+.score-text {
+    animation: countUp 1.5s 0.5s ease-out forwards;
+    counter-reset: num var(--num); /* Link to the animated --num property */
+}
+/* We use a pseudo-element to display the animated number */
+.score-text::before {
+    content: counter(num);
+}
+/* Hide the original '92' text since we're replacing it with the animated counter */
+.score-text .original-number {
+    display: none;
+}
+
+
+/* Make the graphs start empty and draw themselves */
+.graph-svg path {
+    /* A high value to ensure the line is covered */
+    stroke-dasharray: 200; 
+    stroke-dashoffset: 200;
+    /* Apply animation with a later delay */
+    animation: animateGraph 1s 1s ease-in-out forwards;
+}
+        /* === Responsive Overrides for Homepage === */
+        @media (max-width: 992px) {
+            .hero-grid { grid-template-columns: 1fr; }
+            .hero-text { text-align: center; }
+            .hero-text h1 { max-width: 100%; }
+            .hero-text .subheadline { margin-left: auto; margin-right: auto; }
+            .hero-cta { justify-content: center; }
+            .social-proof { justify-content: center; }
+            .hero-dashboard { margin-top: 4rem; }
+        }
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 3.2rem; }
+        }
+        
+       /* === Features Section (v3) === */
+.features-section {
+    padding: 6rem 0;
+    background-color: transparent; /* Clean, solid background */
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Strict 3-column grid */
+    gap: 2rem;
+}
+
+.feature-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-cyan);
+}
+
+.feature-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background-color: rgba(0, 246, 255, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.feature-icon svg {
+    width: 24px;
+    height: 24px;
+    color: var(--accent-cyan);
+}
+
+.feature-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary); /* Changed to primary text color for better readability */
+}
+
+.feature-card h3 .highlight { /* You can wrap text in <span class="highlight"> if needed */
+     color: var(--accent-cyan);
+}
+
+.feature-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* --- Responsive Grid Adjustments --- */
+@media (max-width: 992px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets */
+    }
+}
+
+@media (max-width: 768px) {
+    .features-grid {
+        grid-template-columns: 1fr; /* 1 column for mobile */
+    }
+}
+
+/* === How It Works Section === */
+.how-it-works-section {
+    padding: 6rem 0;
+    background-color: transparent; /* Use a slightly different bg to separate sections */
+}
+
+.steps-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-top: 4rem;
+}
+
+.step {
+    text-align: center;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    background-color: var(--accent-orange);
+    color: var(--text-primary);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 20px rgba(247, 127, 0, 0.4);
+}
+
+.step-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.step-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .steps-container {
+        grid-template-columns: repeat(2, 1fr); /* 2x2 grid for tablets */
+        gap: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .steps-container {
+        grid-template-columns: 1fr; /* 1 column for mobile */
+    }
+}
+
+/* === FAQ Section === */
+.faq-section {
+    padding: 6rem 0;
+    background-color: transparent;
+}
+
+.faq-accordion {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.faq-item {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden; /* Important for the smooth animation */
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    border-color: var(--accent-cyan);
+}
+
+.faq-question {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.faq-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--accent-cyan);
+}
+
+.faq-icon .icon-minus {
+    display: none;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    /* Move padding here and transition it */
+    padding: 0 1.5rem;
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+}
+
+.faq-answer p {
+    /* Remove padding from the paragraph */
+    padding: 0;
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* --- Active State --- */
+.faq-item.active .faq-question {
+    color: var(--accent-cyan);
+}
+
+.faq-item.active .faq-answer {
+    max-height: 300px; /* Adjust if your answers are longer */
+    /* Add padding back for the active state */
+    padding: 0 1.5rem 1.5rem;
+}
+
+.faq-item.active .icon-plus {
+    display: none;
+}
+
+.faq-item.active .icon-minus {
+    display: block;
+}
+    </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
+<div class="background-aurora"></div>
+   
     <div id="navbar-placeholder"></div>
 
-    <main class="flex-grow container mx-auto text-center p-10">
-        <h1 class="text-4xl font-bold mb-4">Welcome to AplyEase</h1>
-        <p class="text-lg text-gray-600">Your AI-powered assistant for landing your dream job.</p>
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-grid">
+    <div class="hero-text">
+        <h1>The <span class="highlight">Smartest</span> Way to Get Hired.</h1>
+        <p class="subheadline">
+            AplyEase combines skilled human assistants with powerful AI to find and apply to perfect-match positions. Our team works directly with you to understand your preferences and deliver tailored results.
+        </p>
+        <div class="hero-cta">
+            <a href="/register.html" class="btn btn-primary">Get Started &rarr;</a>
+            <a href="https://wa.me/yourwhatsappnumber" target="_blank" class="btn btn-whatsapp">Chat on WhatsApp</a>
+        </div>
+        <div class="social-proof">
+            <div class="avatar-group">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User 1">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User 2">
+                <img src="https://randomuser.me/api/portraits/men/41.jpg" alt="User 3">
+            </div>
+            <p>Helping 100+ professionals find their dream jobs</p>
+        </div>
+    </div>
+    <div class="hero-dashboard">
+        <div class="dashboard-row">
+            <span class="dashboard-label">Resume Score</span>
+            <div class="score-circle">
+                <div class="score-text"><span class="original-number">92</span><span>/100</span></div>
+                <svg>
+                    <circle class="circle-bg" cx="50" cy="50" r="45" stroke-width="10" fill="none"></circle>
+                    <circle class="circle-progress" cx="50" cy="50" r="45" stroke-width="10" fill="none"></circle>
+                </svg>
+            </div>
+        </div>
+        <div class="dashboard-row">
+            <span class="dashboard-label">Jobs Tracked</span>
+            <svg class="graph-svg" viewBox="0 0 120 40">
+                <defs>
+                    <linearGradient id="graphGradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(0, 246, 255, 0.3)" />
+                        <stop offset="100%" style="stop-color:rgba(0, 246, 255, 0)" />
+                    </linearGradient>
+                </defs>
+                <path d="M 0 30 C 20 10, 40 10, 60 20 S 100 30, 120 20 V 40 H 0 Z" fill="url(#graphGradient1)"/>
+                <path d="M 0 30 C 20 10, 40 10, 60 20 S 100 30, 120 20" stroke="var(--accent-cyan)" fill="none" stroke-width="2"/>
+                <circle cx="60" cy="20" r="2" fill="var(--accent-cyan)"/>
+            </svg>
+        </div>
+        <div class="dashboard-row">
+            <span class="dashboard-label">Applications</span>
+            <svg class="graph-svg" viewBox="0 0 120 40">
+                 <defs>
+                    <linearGradient id="graphGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(0, 246, 255, 0.3)" />
+                        <stop offset="100%" style="stop-color:rgba(0, 246, 255, 0)" />
+                    </linearGradient>
+                </defs>
+                <path d="M 0 25 C 20 35, 40 10, 60 15 S 100 10, 120 30 V 40 H 0 Z" fill="url(#graphGradient2)"/>
+                <path d="M 0 25 C 20 35, 40 10, 60 15 S 100 10, 120 30" stroke="var(--accent-cyan)" fill="none" stroke-width="2"/>
+                <circle cx="60" cy="15" r="2" fill="var(--accent-cyan)"/>
+                <circle cx="100" cy="10" r="2" fill="var(--accent-cyan)"/>
+            </svg>
+        </div>
+    </div>
+</div>
+            </div>
+        </section>
+        <section id="features" class="features-section">
+    <div class="container">
+        <h2 class="section-title">Why Choose AplyEase?</h2>
+        <div class="features-grid">
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" /></svg>
+                </div>
+                <h3>Human-Guided Matching</h3>
+                <p>Our specialists use intelligent algorithms to connect you with opportunities precisely aligned to your unique skills.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h3>Quality Employers</h3>
+                <p>Curated selection of respected companies with strong workplace cultures.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                </div>
+                <h3>AI + Human Applications</h3>
+                <p>AI creates custom resumes for each job, then human assistants manually review, refine, and submit applications on your behalf.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                </div>
+                <h3>AI + Human Resume Creation</h3>
+                <p>AI generates custom resumes, then human assistants manually refine and optimize before applying on your behalf.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.483M7.5 12h.008v.008H7.5V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 4.5h.008v.008h-.008V16.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                </div>
+                <h3>Dedicated Assistants</h3>
+                <p>Communicate directly with your assigned specialist to refine your job search strategy and preferences.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.916 17.916 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
+                </div>
+                <h3>Visa Support Options</h3>
+                <p>Easily identify employers offering international sponsorship opportunities.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works-section">
+    <div class="container">
+        <h2 class="section-title">How AplyEase Works</h2>
+        <div class="steps-container">
+
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Build Your Profile</h3>
+                <p class="step-description">Share your expertise, background, and career goals with your dedicated job search consultant.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Personal Consultation</h3>
+                <p class="step-description">Your assigned specialist works with you to refine your preferences and understand your unique needs.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3 class="step-title">AI + Human Applications</h3>
+                <p class="step-description">AI generates custom resumes for each job, then your human assistant manually reviews, refines, and submits applications on your behalf.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3 class="step-title">Interview Success</h3>
+                <p class="step-description">Focus your energy on preparing for interviews while your consultant continues optimizing your search.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="faq-section">
+    <div class="container">
+        <h2 class="section-title">Common Questions</h2>
+        <div class="faq-accordion">
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What makes AplyEase different?</span>
+                    <div class="faq-icon">
+                        <svg class="icon-plus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                        <svg class="icon-minus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <p>AplyEase combines human expertise with AI-powered tools to deliver truly personalized job search assistance. Unlike fully automated services, our human assistants work directly with you, using advanced technology to enhance efficiency while maintaining the personal touch that makes all the difference in landing the right position.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Do I have control over which jobs I apply to?</span>
+                    <div class="faq-icon">
+                        <svg class="icon-plus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                        <svg class="icon-minus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <p>Absolutely. You have final approval for every single application. Our assistants prepare and optimize everything, but we will not submit anything on your behalf without your explicit consent for that specific role.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What happens if I want to cancel?</span>
+                    <div class="faq-icon">
+                        <svg class="icon-plus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                        <svg class="icon-minus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <p>You can cancel your subscription at any time, no questions asked. You will retain access to all platform features until the end of your current billing period.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How does the interview process work?</span>
+                    <div class="faq-icon">
+                        <svg class="icon-plus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                        <svg class="icon-minus" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>
+                    </div>
+                </button>
+                <div class="faq-answer">
+                    <p>Once you secure an interview, we provide you with AI-powered tools to help you prepare. This includes common questions tailored to the role, key insights about the company, and strategies for effectively showcasing your skills.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
     </main>
 
     <div id="footer-placeholder"></div>
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all the question buttons
+        const faqQuestions = document.querySelectorAll('.faq-question');
 
-    <script src="/js/main.js"></script>
+        faqQuestions.forEach(button => {
+            button.addEventListener('click', () => {
+                // Find the parent .faq-item for the clicked button
+                const currentItem = button.closest('.faq-item');
+
+                // --- This part is for closing other open items (optional but good UX) ---
+                // Find any item that is already active but is NOT the one we just clicked
+                const alreadyActiveItem = document.querySelector('.faq-item.active');
+                if (alreadyActiveItem && alreadyActiveItem !== currentItem) {
+                    alreadyActiveItem.classList.remove('active');
+                }
+                // -------------------------------------------------------------------------
+
+                // Toggle the 'active' class on the clicked item to open/close it
+                currentItem.classList.toggle('active');
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="/js/particles-config.js"></script>
+<script src="/js/main.js"></script>
 </body>
 </html>
+

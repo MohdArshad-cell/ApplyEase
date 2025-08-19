@@ -16,14 +16,14 @@ public class User {
     private Long id;
 
     private String firstName;
-
     private String lastName;
-    @Column(length = 191, nullable = false, unique = true) 
+
+    @Column(length = 191, nullable = false, unique = true)
     private String email;
 
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY) // <-- THE CHANGE IS HERE
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),

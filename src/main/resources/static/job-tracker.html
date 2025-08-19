@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Tracker - AplyEase</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* === Global & Layout Styles === */
+        body {
+            display: flex; flex-direction: column; min-height: 100vh; margin: 0;
+            padding-top: 70px; font-family: 'Poppins', sans-serif;
+            background-color: #1a1a2e; color: #e0e0e0;
+        }
+        main { flex-grow: 1; }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* === Page Header === */
+        .page-header {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding-bottom: 1rem;
+        }
+
+        /* === Table Styles === */
+        .table-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            overflow-x: auto; /* For responsiveness on small screens */
+        }
+        .applications-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .applications-table th, .applications-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            white-space: nowrap; /* Prevents text from wrapping */
+        }
+        .applications-table thead {
+            background-color: rgba(0, 255, 255, 0.1);
+        }
+        .applications-table th {
+            font-weight: 600;
+            color: #00ffff;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .applications-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .applications-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .applications-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main>
+        <div class="container">
+            <h1 class="page-header">My Job Application Tracker</h1>
+            
+            <div class="table-container">
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Job Title</th>
+                            <th>Date Applied</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applications-table-body">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 3rem;">Loading applications...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/job-tracker.js"></script>
+</body>
+</html>

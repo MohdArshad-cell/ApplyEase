@@ -4,28 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AplyEase</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-main {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem 1.5rem;
+            position: relative; /* Establishes stacking context */
+            z-index: 1; /* Puts content above background animations */
+        }
+
+        .auth-container {
+    width: 100%;
+    max-width: 450px;
+    
+    /* --- Restoring the Glass Effect --- */
+    background: rgba(22, 28, 49, 0.65); /* Semi-transparent base */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 3rem;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+        .auth-container h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 246, 255, 0.2);
+        }
+        
+        .btn-full {
+            width: 100%;
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .auth-footer {
+            margin-top: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .extra-options {
+            display: flex;
+            justify-content: flex-end; /* Aligns "Forgot Password?" to the right */
+            margin-top: -0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .extra-options a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .extra-options a:hover {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+
+    </style>
 </head>
 <body>
-    <div class="form-container">
-        <form id="login-form">
-            <h2>Welcome Back</h2>
-            <div class="input-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required autocomplete="email">
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required autocomplete="current-password">
-            </div>
-            
-            <div id="message"></div>
+<div class="background-aurora"></div>
+    <div id="navbar-placeholder"></div>
 
-            <button type="submit" class="btn">Log In</button>
-        </form>
-        <p class="form-footer">Don't have an account? <a href="/register.html">Sign Up</a></p>
-    </div>
+    <main class="auth-main">
+        <div class="auth-container">
+            <h1>Welcome Back!</h1>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
 
-    <script src="/js/login.js"></script>
+                <div class="extra-options">
+                    <a href="/forgot-password.html">Forgot Password?</a>
+                </div>
+                
+                <div id="message" style="min-height: 24px; margin: 1rem 0;"></div>
+
+                <button type="submit" class="btn btn-primary btn-full">Log In</button>
+            </form>
+            <p class="auth-footer">Don't have an account? <a href="/register.html">Sign Up</a></p>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+<script src="/js/register.js"></script>
+    <script src="/js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="/js/particles-config.js"></script>
+
 </body>
 </html>

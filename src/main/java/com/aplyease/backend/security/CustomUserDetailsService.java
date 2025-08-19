@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // <-- IMPORT THIS
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,18 +23,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
+    @Transactional // <-- ADD THIS ANNOTATION
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // 1. Find our user from our database by their email
+        // Find our user from our database by their email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with email: " + email));
 
-        // 2. Convert our Roles into Spring Security's GrantedAuthority objects
+        // Convert our Roles into Spring Security's GrantedAuthority objects
         Set<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toSet());
 
-        // 3. Return a new UserDetails object that Spring Security can understand
+        // Return a new UserDetails object that Spring Security can understand
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),

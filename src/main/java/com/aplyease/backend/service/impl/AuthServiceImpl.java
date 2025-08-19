@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(signUpDto.getEmail());
         user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
+        Role userRole = roleRepository.findByName("ROLE_GUEST")
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         user.setRoles(Collections.singleton(userRole));
 

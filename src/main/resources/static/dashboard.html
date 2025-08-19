@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AplyEase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* The CSS from our previous dashboard.html step is still correct */
+        body{display:flex;flex-direction:column;min-height:100vh;margin:0;padding-top:70px;font-family:'Poppins',sans-serif;background-color:#1a1a2e;color:#e0e0e0}main{flex-grow:1}.container{width:100%;max-width:1200px;margin:0 auto;padding:2rem}.welcome-header{text-align:center;margin-bottom:3rem}#welcome-message{font-size:2.5rem;font-weight:600;color:#fff}.welcome-header p{font-size:1.1rem;color:#a0a0a0}.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem}.action-card{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);border-radius:15px;padding:2rem;text-align:center;transition:transform .3s,box-shadow .3s;text-decoration:none;color:#e0e0e0}.action-card:hover{transform:translateY(-10px);box-shadow:0 8px 32px 0 rgba(0,0,0,.37)}.action-card-icon{font-size:3rem;margin-bottom:1rem}.action-card h3{font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:.5rem}.action-card p{color:#a0a0a0}
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main>
+        <div class="container">
+            <div class="welcome-header">
+                <h1 id="welcome-message">Welcome to AplyEase!</h1>
+                <p id="welcome-subtitle">What would you like to do today?</p>
+            </div>
+
+            <div id="action-cards-container" class="action-grid">
+    <a href="/pricing.html" id="subscribe-card" class="action-card" style="display: none;">
+        <div class="action-card-icon">🚀</div>
+        <h3>Upgrade Your Plan</h3>
+        <p>Unlock our powerful AI tools by choosing a subscription.</p>
+    </a>
+    
+    <a href="/job-tracker.html" id="tracker-card" class="action-card" style="display: none;">
+        <div class="action-card-icon">📝</div>
+        <h3>Job Application Tracker</h3>
+        <p>View and manage all your job applications.</p>
+    </a>
+
+    <a href="/add-application.html" id="add-app-card" class="action-card" style="display: none;">
+        <div class="action-card-icon">➕</div>
+        <h3>Add New Application</h3>
+        <p>Submit a new job application on behalf of a client.</p>
+    </a>
+</div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

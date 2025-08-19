@@ -1,27 +1,15 @@
-<nav class="bg-gray-900 bg-opacity-80 backdrop-blur-md shadow-lg fixed w-full z-10">
-    <div class="container mx-auto px-6 py-3">
-        <div class="flex items-center justify-between">
-            <a href="/" class="text-2xl font-bold text-white hover:text-cyan-400 transition-colors">AplyEase</a>
-
-            <div class="md:hidden">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="/" class="text-gray-300 hover:text-cyan-400 transition-colors">Home</a>
-                <a href="/job-tracker.html" class="text-gray-300 hover:text-cyan-400 transition-colors">Job Tracker</a>
-                
-                <a id="login-btn-desktop" href="/login.html" class="bg-cyan-500 text-white py-2 px-4 rounded-lg hover:bg-cyan-600 transition-all">
-                    Login
-                </a>
-                <button id="logout-btn-desktop" class="hidden bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-all">
-                    Logout
-                </button>
-            </div>
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="/" class="nav-logo">Aply<span>Ease</span></a>
+        <div class="nav-links">
+            <a href="/#features">Features</a>
+            <a href="/pricing.html">Pricing</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/contact.html">Contact</a>
+        </div>
+        <div class="nav-actions">
+            <a href="/login.html" class="btn btn-secondary">Sign In</a>
+            <a href="/register.html" class="btn btn-primary">Sign Up</a>
         </div>
     </div>
 </nav>
