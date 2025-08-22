@@ -1,13 +1,11 @@
-// src/main/resources/static/js/login.js
+// js/login.js
 document.getElementById('login-form').addEventListener('submit', function(event) {
     event.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const messageDiv = document.getElementById('message');
-
     const loginData = { email: email, password: password };
 
-    // Step 1: Attempt to log in and get the token
     fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -18,24 +16,22 @@ document.getElementById('login-form').addEventListener('submit', function(event)
         return response.json();
     })
     .then(data => {
-        // Step 2: Login was successful, save the token
-        const token = data.accessToken;
-        localStorage.setItem('accessToken', token);
-
-        // Step 3: Immediately use the new token to find out the user's role
+        // Step 1: Save the token.
+        localStorage.setItem('accessToken', data.accessToken);
+        
+        // Step 2: Also save the user's name for the navbar greeting.
+        // We need to fetch it before redirecting.
         return fetch('/api/user/me', {
-            headers: { 'Authorization': 'Bearer ' + token }
+            headers: { 'Authorization': 'Bearer ' + data.accessToken }
         });
     })
     .then(response => response.json())
     .then(user => {
-        // Step 4: Redirect based on the role
-        if (user.roles.includes('ROLE_GUEST')) {
-            window.location.href = '/guest-dashboard.html';
-        } else {
-            // For CLIENT, AGENT, or ADMIN
-            window.location.href = '/dashboard.html';
+        if (user && user.firstName) {
+            localStorage.setItem('userFirstName', user.firstName);
         }
+        // Step 3: ALWAYS redirect to the main dashboard.
+        window.location.href = '/dashboard.html';
     })
     .catch(error => {
         messageDiv.textContent = error.message;

@@ -1,51 +1,47 @@
 // js/dashboard.js
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('accessToken');
-    
+    const dashboardContent = document.getElementById('dashboard-content');
+
     if (!token) {
         window.location.href = '/login.html';
         return;
     }
 
-    // Get references to all the elements we need to change
-    const welcomeMessage = document.getElementById('welcome-message');
-    const welcomeSubtitle = document.getElementById('welcome-subtitle');
-    const subscribeCard = document.getElementById('subscribe-card');
-    const trackerCard = document.getElementById('tracker-card');
-    const addAppCard = document.getElementById('add-app-card'); // New card reference
+    const loadDashboardPartial = (partialPath) => {
+        fetch(partialPath)
+            .then(response => response.text())
+            .then(html => dashboardContent.innerHTML = html)
+            .catch(error => console.error(`Error loading partial: ${partialPath}`, error));
+    };
 
     fetch('/api/user/me', {
         headers: { 'Authorization': 'Bearer ' + token }
     })
     .then(response => {
-        if (!response.ok) { return window.location.href = '/login.html'; }
+        if (!response.ok) { throw new Error('Session expired.'); }
         return response.json();
     })
     .then(user => {
-        if (user && user.firstName) {
-            welcomeMessage.textContent = `Welcome Back, ${user.firstName}!`;
-        }
-
-        // --- Role-Based Logic ---
-        if (user.roles.includes('ROLE_GUEST')) {
-            welcomeSubtitle.textContent = 'You are on a guest plan. Upgrade to unlock more features!';
-            subscribeCard.style.display = 'block';
-        } 
+        if (!user) return;
         
-        if (user.roles.includes('ROLE_CLIENT')) {
-            welcomeSubtitle.textContent = 'View the status of your applications.';
-            trackerCard.style.display = 'block';
-        }
-        
-        // UPDATED LOGIC: Show tracker and add cards for AGENT or ADMIN
-        if (user.roles.includes('ROLE_AGENT') || user.roles.includes('ROLE_ADMIN')) {
-             welcomeSubtitle.textContent = 'What would you like to do today?';
-            trackerCard.style.display = 'block';
-            addAppCard.style.display = 'block'; // Show the "Add Application" card
+        // --- NEW PRIORITY-BASED ROLE CHECK ---
+        if (user.roles.includes('ROLE_ADMIN')) {
+            loadDashboardPartial('/partials/dashboard-agent.html'); // Admins see the agent view for now
+        } else if (user.roles.includes('ROLE_AGENT')) {
+            loadDashboardPartial('/partials/dashboard-agent.html');
+        } else if (user.roles.includes('ROLE_CLIENT')) {
+            loadDashboardPartial('/partials/dashboard-client.html');
+        } else if (user.roles.includes('ROLE_GUEST')) {
+            // This will only run if none of the other roles are present
+            loadDashboardPartial('/partials/dashboard-guest.html');
+        } else {
+            dashboardContent.innerHTML = `<p>Welcome! Your dashboard is being set up.</p>`;
         }
     })
     .catch(error => {
-        console.error('Error fetching user data:', error);
+        console.error('Error:', error);
+        localStorage.removeItem('accessToken');
         window.location.href = '/login.html';
     });
 });

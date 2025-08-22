@@ -95,7 +95,19 @@ body {
     padding: 0 1.5rem;
     box-sizing: border-box;
 }
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 
+    
+}
+.content-wrapper {
+    flex: 1; /* This is the key: it makes the main content grow */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* This helps center content vertically */
+}
 /* === 2. Typography === */
 .section-title {
     text-align: center;

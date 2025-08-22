@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - AplyEase</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* === 1. GLOBAL VARIABLES & BASE === */
+        :root {
+            --dark-bg: #0A0F1E; --card-bg: #12182B;
+            --border-color: rgba(67, 97, 255, 0.2);
+            --text-primary: #FFFFFF; --text-secondary: #8A93B1;
+            --accent-cyan: #00F6FF; --accent-purple: #6248FF;
+            --glow-color: rgba(0, 246, 255, 0.5);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+        }
+
+        /* === 2. LAYOUT === */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 80px;
+        }
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        /* === 3. CONTACT SECTION STYLES === */
+        .touch-card {
+            background-color: rgba(10, 15, 30, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .touch-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .touch-info h2 { font-size: 2.8rem; font-weight: 700; margin: 0 0 1rem 0; color: var(--text-primary); }
+        .touch-info p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; }
+        .touch-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .touch-option { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; text-decoration: none; color: var(--text-secondary); background-color: var(--dark-bg); border: 1px solid var(--border-color); transition: all 0.3s ease; }
+        .touch-option:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .touch-option svg { width: 24px; height: 24px; flex-shrink: 0; }
+        
+        .touch-form { display: flex; flex-direction: column; }
+        .touch-form .form-group { margin-bottom: 1.5rem; }
+        .touch-form input, .touch-form textarea { width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--dark-bg); color: var(--text-primary); box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        .touch-form .btn { align-self: center; padding: 0.8rem 3rem; }
+
+        @media (max-width: 992px) { .touch-card { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="background-aurora"></div>
+
+    <div class="page-container">
+        <div id="navbar-placeholder"></div>
+
+        <main class="content-wrapper">
+            <div class="container">
+                <div class="touch-card">
+                    <div class="touch-info">
+                        <h2>Get In Touch</h2>
+                        <p>Have a question or want to work with us? Drop us a line or connect with us on social media.</p>
+                        <div class="touch-options">
+                            <a href="mailto:contact@aplyease.com" class="touch-option">
+                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" /><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" /></svg>
+                                <span>Email Us</span>
+                            </a>
+                            <a href="#" class="touch-option">
+                                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.75 13.96c.25.13.4.38.4.66v.29c0 .3-.15.58-.4.71l-1.42.71c-.25.13-.53.16-.79.1-.52-.13-1.62-.64-3-1.92s-2.05-2.73-2.23-3.3c-.04-.15-.04-.31 0-.46l.71-1.26c.13-.25.38-.4.66-.4h.29c.3 0 .58.15.71.4l.82 1.43c.13.25.16.53.1.79l-.29.98c-.08.25.04.53.29.66l2.11 1.05zM12 2a10 10 0 110 20 10 10 0 010-20z"/></svg>
+                                <span>WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                    <form class="touch-form">
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" rows="5" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+        
+        <div id="footer-placeholder"></div>
+    </div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const touchCard = document.querySelector('.touch-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            if (touchCard) {
+                observer.observe(touchCard);
+            }
+        });
+    </script>
+    
+    <script src="/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="/js/particles-config.js"></script>
+
+    
+    
+</body>
+</html>

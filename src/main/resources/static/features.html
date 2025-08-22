@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - AplyEase</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+
+    <style>
+        /* Page-specific styles for the features page */
+        .page-header {
+            text-align: center;
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0 0 1rem 0;
+        }
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feature-detail-section {
+            padding: 5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        /* Style for alternating layout */
+        .feature-detail-section:nth-child(odd) .feature-grid {
+            grid-template-areas: "text image";
+        }
+        .feature-detail-section:nth-child(even) .feature-grid {
+            grid-template-areas: "image text";
+        }
+        .feature-text { grid-area: text; }
+        .feature-image { grid-area: image; }
+
+        .feature-text h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin: 0 0 1rem 0;
+            color: var(--accent-cyan);
+        }
+        .feature-text p {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        .feature-text ul {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-text li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 0.75rem;
+        }
+        .feature-text li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+        
+        .feature-image div {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .feature-grid,
+            .feature-detail-section:nth-child(even) .feature-grid {
+                grid-template-columns: 1fr;
+                grid-template-areas: "image" "text";
+                gap: 2rem;
+            }
+        }
+        .cta-section {
+        padding: 5rem 2rem;
+        background-color: transparent;
+        border-top: 1px solid var(--border-color);
+        text-align: center;
+    }
+    .cta-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .cta-content h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1.3;
+        margin: 0 0 1rem 0;
+    }
+    .cta-content p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin: 0 auto 2.5rem auto;
+    }
+    .cta-button {
+        display: inline-block;
+        text-decoration: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        background-color: var(--accent-cyan);
+        color: var(--dark-bg);
+        box-shadow: 0 0 25px var(--glow-color);
+    }
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 35px var(--glow-color);
+    }
+    </style>
+</head>
+<body>
+   <div class="background-aurora"></div>
+    <div class="page-container">
+        <div id="navbar-placeholder"></div>
+
+        <main class="content-wrapper">
+            <div class="container">
+                
+                <header class="page-header fade-in">
+                    <h1>Our Features</h1>
+                    <p>Discover how AplyEase leverages AI and human expertise to give you an unparalleled advantage in your job search.</p>
+                </header>
+
+                <section class="feature-detail-section">
+                    <div class="feature-grid">
+                        <div class="feature-text fade-in">
+                            <h2>AI-Powered Career Matching</h2>
+                            <p>Our system goes beyond keywords. We analyze your entire professional profile—your skills, experience, and career goals—to find jobs that are a perfect fit, saving you from sorting through irrelevant listings.</p>
+                            <ul>
+                                <li>Intelligent skill analysis</li>
+                                <li>Matches based on career trajectory</li>
+                                <li>Identifies roles you might have missed</li>
+                            </ul>
+                        </div>
+                        <div class="feature-image fade-in">
+                            <div>[Visual Placeholder]</div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="feature-detail-section">
+                    <div class="feature-grid">
+                        <div class="feature-text fade-in">
+                            <h2>Human-Assisted Automation</h2>
+                            <p>We combine the speed of AI with the nuance of human expertise. Our AI prepares applications, but a dedicated human assistant reviews and submits every single one, ensuring quality and accuracy.</p>
+                             <ul>
+                                <li>Eliminates repetitive data entry</li>
+                                <li>Ensures every application is high-quality</li>
+                                <li>Frees you to focus on interviews</li>
+                            </ul>
+                        </div>
+                         <div class="feature-image fade-in">
+                            <div>[Visual Placeholder]</div>
+                        </div>
+                    </div>
+                </section>
+
+                 <section class="feature-detail-section">
+                    <div class="feature-grid">
+                        <div class="feature-text fade-in">
+                            <h2>Resume & CV Enhancement</h2>
+                            <p>For each application, our AI generates a tailored resume optimized to pass through Applicant Tracking Systems (ATS) and catch the eye of recruiters, significantly increasing your interview chances.</p>
+                             <ul>
+                                <li>Custom resumes for every job</li>
+                                <li>ATS optimization included</li>
+                                <li>Highlights your most relevant skills</li>
+                            </ul>
+                        </div>
+                         <div class="feature-image fade-in">
+                            <div>[Visual Placeholder]</div>
+                        </div>
+                    </div>
+                </section>
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Supercharge Your Job Search?</h2>
+        <p>Join hundreds of professionals who have landed their dream jobs faster with AplyEase. Your next career move is just a click away.</p>
+        <a href="/register.html" class="cta-button">Get Started for Free</a>
+    </div>
+</section>
+            </div>
+        </main>
+        
+        <div id="footer-placeholder"></div>
+    </div>
+
+    <script src="/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script src="/js/particles-config.js"></script>
+    <script>
+        // Page-specific script for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            const fadeInElements = document.querySelectorAll('.fade-in');
+            fadeInElements.forEach((el) => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

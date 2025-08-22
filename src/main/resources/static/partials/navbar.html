@@ -1,15 +1,175 @@
+<style>
+/* css/navbar.css - Final styles for the navbar component */
+.navbar {
+    background: rgba(10, 15, 30, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 1.25rem 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-color);
+}
+.navbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: none;
+}
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+.nav-links a:hover {
+    color: var(--text-primary);
+}
+
+/* --- Dropdown Styles --- */
+.profile-dropdown {
+    position: relative; /* Establishes a positioning context for the menu */
+}
+.dropdown-trigger {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+}
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 1rem); /* Position 1rem below the trigger */
+    right: 0;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+.dropdown-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.dropdown-menu a, .dropdown-menu button {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    color: var(--text-secondary);
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+.dropdown-menu a:hover, .dropdown-menu button:hover {
+    background-color: rgba(0, 246, 255, 0.1);
+    color: var(--accent-cyan);
+}
+
+/* --- Responsive & Desktop/Mobile Toggling --- */
+.navbar-toggler { display: none; }
+.desktop-menu { display: flex; align-items: center; gap: 2rem; }
+.mobile-menu { display: none; }
+
+@media (max-width: 768px) {
+    .desktop-menu { display: none; }
+    .navbar-toggler {
+        display: block;
+        font-size: 1.8rem;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+    }
+    .mobile-menu {
+        display: none;
+        background-color: var(--card-bg);
+        padding: 1rem 0;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+    }
+    .mobile-menu.active { display: block; }
+    .mobile-menu a, .mobile-menu .profile-dropdown {
+        display: block;
+        padding: 1rem 1.5rem;
+    }
+}
+.nav-logged-in-group {
+    display: flex;
+    align-items: center;
+    gap: 2rem; /* Matches the gap of the other nav links */
+}
+</style>
+
+
 <nav class="navbar">
-    <div class="container nav-container">
-        <a href="/" class="nav-logo">Aply<span>Ease</span></a>
-        <div class="nav-links">
-            <a href="/#features">Features</a>
+    <div class="navbar-container">
+        <a href="/" class="navbar-brand">AplyEase</a>
+
+        <div class="desktop-menu nav-links">
+            <a href="/features.html">Features</a>
             <a href="/pricing.html">Pricing</a>
-            <a href="/blog.html">Blog</a>
             <a href="/contact.html">Contact</a>
+
+            <div id="logged-out-view-desktop">
+                <a href="/login.html" class="btn btn-outline">Sign In</a>
+            </div>
+
+            <div id="logged-in-view-desktop" class="nav-logged-in-group">
+                <a href="/dashboard.html">Dashboard</a>
+                <div class="profile-dropdown">
+                    <button id="dropdown-trigger-desktop" class="dropdown-trigger">
+                        <span>Hi, <span id="profile-firstname-desktop"></span></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                    </button>
+                    <div id="dropdown-menu-desktop" class="dropdown-menu">
+                        <a href="/profile.html">Profile</a>
+                        <button id="logout-btn-desktop">Logout</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="nav-actions">
-            <a href="/login.html" class="btn btn-secondary">Sign In</a>
-            <a href="/register.html" class="btn btn-primary">Sign Up</a>
+
+        <button id="mobile-menu-button" class="navbar-toggler">&#9776;</button>
+    </div>
+
+    <div id="mobile-menu" class="mobile-menu nav-links">
+        <a href="/#features">Features</a>
+        <a href="/pricing.html">Pricing</a>
+        <a href="/contact.html">Contact</a>
+        
+        <div id="logged-out-view-mobile">
+            <a href="/login.html">Sign In</a>
+        </div>
+        <div id="logged-in-view-mobile">
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/profile.html">Profile (<span id="profile-firstname-mobile"></span>)</a>
+            <button id="logout-btn-mobile">Logout</button>
         </div>
     </div>
 </nav>

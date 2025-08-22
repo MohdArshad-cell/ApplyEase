@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - AplyEase</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+
+    <style>
+        /* Page-specific styles for the applications dashboard */
+        .dashboard-container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+        .dashboard-header, .dashboard-toolbar, .dashboard-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .dashboard-tabs { display: flex; gap: 1rem; }
+        .dashboard-tabs a { padding: 0.5rem 1rem; text-decoration: none; color: var(--text-secondary); font-weight: 500; border-radius: 8px; transition: all 0.3s ease; }
+        .dashboard-tabs a.active, .dashboard-tabs a:hover { background-color: var(--accent-cyan); color: var(--dark-bg); }
+        .action-buttons { display: flex; gap: 1rem; }
+        .action-buttons .btn { padding: 0.5rem 1rem; font-size: 0.9rem; }
+        .search-bar { position: relative; width: 300px; }
+        .search-bar input { width: 100%; background-color: var(--dark-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; padding: 0.6rem 1rem 0.6rem 2.5rem; }
+        .search-bar svg { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        
+        /* This makes the table scroll horizontally on small screens */
+        .table-wrapper { overflow-x: auto; }
+        .data-table { width: 100%; min-width: 1200px; /* Force a minimum width to demonstrate scrollbar */ border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+        .data-table th { font-weight: 600; color: var(--text-secondary); font-size: 0.9rem; }
+        .data-table .link-style { color: var(--accent-cyan); text-decoration: none; }
+        
+        .dashboard-footer { border-bottom: none; margin-bottom: 0; padding-bottom: 0; font-size: 0.9rem; color: var(--text-secondary); }
+        .pagination-controls { display: flex; align-items: center; gap: 0.5rem; }
+        .pagination-controls button { background: none; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 5px; cursor: pointer; width: 30px; height: 30px; }
+    </style>
+</head>
+<body>
+    <div class="background-aurora"></div>
+    <div class="page-container">
+        <div id="navbar-placeholder"></div>
+
+        <main class="content-wrapper">
+            <div class="container">
+                <div class="dashboard-container">
+                    <div class="dashboard-header">
+                        <div class="dashboard-tabs">
+                            <a href="#" class="active">Search</a>
+                            <a href="#">Saved</a>
+                            <a href="#">Delegated</a>
+                            <a href="#">Applied</a>
+                            <a href="#">Interview</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary">Trash</button>
+                            <button class="btn btn-primary">Export to Excel</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-toolbar">
+                        <div class="search-bar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>
+                            <input type="text" placeholder="search...">
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date Applied</th>
+                                    <th>Applied by</th>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Portal</th>
+                                    <th>Job Link</th>
+                                    <th>Resume</th>
+                                    <th>Status</th>
+                                    <th>Mail Sent?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2025-08-21</td>
+                                    <td>Agent One</td>
+                                    <td>AI Engineer</td>
+                                    <td>Innovate Inc.</td>
+                                    <td>San Francisco, CA</td>
+                                    <td>LinkedIn</td>
+                                    <td><a href="#" class="link-style">View</a></td>
+                                    <td><a href="#" class="link-style">Resume_v3.1.pdf</a></td>
+                                    <td>Applied</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>2025-08-20</td>
+                                    <td>Agent One</td>
+                                    <td>Data Scientist</td>
+                                    <td>Quantum Solutions</td>
+                                    <td>New York, NY</td>
+                                    <td>Company Website</td>
+                                    <td><a href="#" class="link-style">View</a></td>
+                                    <td><a href="#" class="link-style">Resume_v3.0.pdf</a></td>
+                                    <td>Interviewing</td>
+                                    <td>Yes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="dashboard-footer">
+                        <span>Showing 1-2 of 2 results.</span>
+                        <div class="pagination-controls">
+                            <span>Page 1 of 1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="footer-placeholder"></div>
+    </div>
+    <script src="/js/main.js"></script>
+</body>
+</html>

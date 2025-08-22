@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,16 +38,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/favicon.ico", "/*.html", "/partials/**", "/css/**", "/js/**", "/api/auth/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/api/auth/logout")
-                .logoutSuccessHandler((request, response, authentication) -> response.setStatus(200))
+                // THIS RULE PERMITS EVERY SINGLE REQUEST - NO SECURITY
+                .anyRequest().permitAll()
             );
-
-        // Tell Spring Security to use our custom filter BEFORE its own username/password filter
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
