@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: ApplyEase
+    region: singapore
+    plan: free
+    
+    buildCommand: "./mvnw clean package -DskipTests"
+    startCommand: "java -jar target/aplyease-backend-0.0.1-SNAPSHOT.jar"
+    
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://dpg-d2ksorbipnbc73fi6ckg-a:5432/aplyease_db_8ghu
+      - key: SPRING_DATASOURCE_USERNAME
+        value: aplyease_db_8ghu_user
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: P0GL0N5HKPptqpD1rcRaCOQZhIZT94Cz
+      - key: spring.profiles.active
+        value: prod
