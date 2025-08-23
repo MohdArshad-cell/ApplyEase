@@ -1,28 +1,29 @@
-# Use OpenJDK 17 as base image
-FROM openjdk:17-jdk-alpine
+# Stage 1: Build with Maven
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy Maven wrapper and project files
-COPY mvnw .
-COPY .mvn .mvn
+# Copy pom.xml and download dependencies
 COPY pom.xml .
-
-# Copy source code
-COPY src src
-
-# Make Maven wrapper executable
+COPY .mvn .mvn
+COPY mvnw .
 RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
 
-# Build the Spring Boot application
+# Copy source code and build
+COPY src src
 RUN ./mvnw clean package -DskipTests
 
-# Copy the generated JAR to container
-COPY target/aplyease-backend-0.0.1-SNAPSHOT.jar app.jar
+# Stage 2: Run the application
+FROM openjdk:17-jdk-alpine
 
-# Expose the default port
+WORKDIR /app
+
+# Copy the built JAR from the builder stage
+COPY --from=builder /app/target/aplyease-backend-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose port
 EXPOSE 8080
 
-# Run the Spring Boot application
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+# Start app
+ENTRYPOINT ["java","-jar","app.jar"]
