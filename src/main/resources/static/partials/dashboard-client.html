@@ -1,28 +1,471 @@
-<div class="container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - AplyEase</title>
     
-    <div class="welcome-header">
-        <h1 id="welcome-message">Welcome Back!</h1>
-        <p id="welcome-subtitle">Here's a summary of your job search progress.</p>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+
+    <style>
+        /* ===================================
+   Base Layout & Page Structure
+   =================================== */
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-wrapper {
+    flex: 1;
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* ===================================
+   Page Header & Plan Badge
+   =================================== */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(135, 206, 235, 0.15); 
+}
+
+.page-header .page-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.25);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.plan-display {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #a0b4d4;
+}
+
+.plan-badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    background-color: rgba(0, 255, 255, 0.1);
+    color: #00FFFF;
+    font-weight: 600;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+}
+
+/* ===================================
+   Stats Grid & Cards
+   =================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: rgba(10, 15, 30, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 1.5rem;
+}
+
+.stat-card .label {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0;
+}
+
+.value-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.icon-circle svg {
+    width: 24px;
+    height: 24px;
+}
+
+.icon-circle.icon-blue svg { stroke: #5096ff; }
+.icon-circle.icon-yellow svg { stroke: #ffc107; }
+.icon-circle.icon-green svg { stroke: #25D366; }
+.icon-circle.icon-cyan svg { stroke: var(--accent-cyan); }
+
+/* ===================================
+   Applications Table & Toolbar
+   =================================== */
+.applications-container {
+    background-color: rgba(10, 15, 30, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.table-filters input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    min-width: 250px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.applications-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.applications-table th, .applications-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.applications-table th {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-applied { background-color: #3b82f630; color: #60a5fa; }
+.status-interviewing { background-color: #f59e0b30; color: #fbbf24; }
+.status-rejected { background-color: #ef444430; color: #f87171; }
+.status-offer { background-color: #22c55e30; color: #4ade80; }
+
+.action-icons a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin: 0 0.5rem;
+    display: inline-block;
+}
+
+.action-icons a:hover {
+    color: var(--accent-cyan);
+}
+
+.action-icons svg {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+/* ===================================
+   Details Modal (Consolidated)
+   =================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: rgba(16, 22, 42, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to bottom right, rgba(0, 255, 255, 0.5), rgba(135, 206, 235, 0.1));
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    color: #ecf0f1;
+    border-radius: 15px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.95);
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-button:hover {
+    color: var(--text-primary);
+}
+
+.modal-divider {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 1.5rem 0;
+}
+
+.modal-header-details {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#modal-job-title {
+    margin: 0;
+    font-size: 1.75rem;
+    color: var(--text-primary);
+}
+
+#modal-company-name {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.modal-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.detail-item .label {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.detail-item .value {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.detail-icon {
+    color: var(--accent-cyan);
+    margin-top: 2px;
+}
+
+.detail-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.links-list li {
+    margin-bottom: 0.75rem;
+}
+
+.links-list a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--accent-cyan);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.links-list a:hover {
+    color: white;
+}
+
+.notes-box {
+    background-color: rgba(0,0,0,0.2);
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+    </style>
+</head>
+<body>
+    <div class="background-aurora"></div>
+    <div class="page-container">
+        <div id="navbar-placeholder"></div>
+        <main class="content-wrapper">
+    <div class="container">
+
+        <div class="page-header">
+            <h2 class="page-title">My Dashboard</h2>
+            <div class="plan-display" id="current-plan-display">
+                Current Plan: <span class="plan-badge">Loading...</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p class="label">Total Applications</p>
+                <div class="value-container">
+                    <p class="value" id="stats-total">0</p>
+                    <div class="icon-circle icon-blue">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <p class="label">Awaiting Response</p>
+                <div class="value-container">
+                    <p class="value" id="stats-pending">0</p>
+                     <div class="icon-circle icon-yellow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <p class="label">Interviews</p>
+                <div class="value-container">
+                    <p class="value" id="stats-interviews">0</p>
+                    <div class="icon-circle icon-cyan">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <p class="label">Offers</p>
+                <div class="value-container">
+                    <p class="value" id="stats-offers">0</p>
+                    <div class="icon-circle icon-green">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="applications-container">
+            <div class="section-header">
+                <h3 style="margin: 0;">My Job Applications</h3>
+                <div class="table-filters">
+                     <input type="search" id="search-input" placeholder="Search company or job title...">
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="applications-table">
+                    <thead>
+                        <tr>
+                            <th>Date Applied</th>
+                            <th>Company</th>
+                            <th>Job Title</th>
+                            <th>Portal</th>
+                            <th>Applied By</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applications-table-body">
+                        <tr><td colspan="7" style="text-align: center; padding: 4rem;">Loading your applications...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
+</main>
 
-    <div class="action-grid">
-        <a href="/job-tracker.html" class="action-card">
-            <div class="action-card-icon">📝</div>
-            <h3>Job Application Tracker</h3>
-            <p>View the status of all applications submitted on your behalf.</p>
-        </a>
-        
-        <a href="#" class="action-card">
-            <div class="action-card-icon">📄</div>
-            <h3>AI Resume Hub</h3>
-            <p>Access your generated resumes and cover letters.</p>
-        </a>
-
-        <a href="#" class="action-card">
-            <div class="action-card-icon">⚙️</div>
-            <h3>Account Settings</h3>
-            <p>Manage your profile and subscription details.</p>
-        </a>
+<div id="details-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">Application Details</h3>
+            <button id="close-modal-btn" class="close-button">&times;</button>
+        </div>
+        <div id="modal-body" class="modal-body-content">
+            </div>
     </div>
-
 </div>
+        <div id="footer-placeholder"></div>
+    </div>
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 package com.aplyease.backend.controller;
 
+import com.aplyease.backend.dto.ClientDto;
 import com.aplyease.backend.dto.UserDto;
-import com.aplyease.backend.model.User;
-import com.aplyease.backend.repository.UserRepository;
+import com.aplyease.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,61 +11,34 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    // A single constructor to inject the service
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()") // Ensures only logged-in users can access this
     public ResponseEntity<UserDto> getCurrentUser(Principal principal) {
-        // Find the full user object from the database using the email from the token
-        User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
-
-        // Create a DTO to safely transfer user data
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setFirstName(user.getFirstName());
-        userDto.setLastName(user.getLastName());
-        userDto.setEmail(user.getEmail());
-
-        // Get the names of the roles and add them to the DTO
-        Set<String> roles = user.getRoles().stream()
-                            .map(role -> role.getName())
-                            .collect(Collectors.toSet());
-        userDto.setRoles(roles);
-
+        // Delegate the logic to the service layer
+        UserDto userDto = userService.getUserByEmail(principal.getName());
         return ResponseEntity.ok(userDto);
     }
- // Add this method inside your UserController.java class
 
     @GetMapping("/clients")
-    @PreAuthorize("hasAnyRole('AGENT', 'ADMIN')")
-    public ResponseEntity<List<UserDto>> getAllClients() {
-        // We'll find all users that have the "ROLE_CLIENT"
-        List<UserDto> clients = userRepository.findAll().stream()
-                .filter(user -> user.getRoles().stream()
-                        .anyMatch(role -> role.getName().equals("ROLE_CLIENT")))
-                .map(user -> { // Convert each client User to a UserDto
-                    UserDto userDto = new UserDto();
-                    userDto.setId(user.getId());
-                    userDto.setFirstName(user.getFirstName());
-                    userDto.setLastName(user.getLastName());
-                    userDto.setEmail(user.getEmail());
-                    return userDto;
-                })
-                .collect(Collectors.toList());
-        
+    @PreAuthorize("hasRole('AGENT')") 
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+        List<ClientDto> clients = userService.getAllClients();
         return ResponseEntity.ok(clients);
     }
-}
+ // In UserController.java
 
+ // ... other methods
+
+
+}

@@ -3,45 +3,87 @@ package com.aplyease.backend.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "job_applications")
+@Table(name = "applications")
 public class JobApplication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long applicationId;
 
-    private String companyName;
-    private String jobTitle;
-    private String jobCategory;
-    private String location;
-    private String status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
+    private User client;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agent_id", nullable = false)
+    private User agent;
+
+    @Column(nullable = false)
     private LocalDate applicationDate;
+
+    @Column(nullable = false)
+    private String jobTitle;
+
+    @Column(nullable = false)
+    private String companyName;
+
+    @Column(name = "location")
+    private String location;
+
+    @Column(name = "job_portal")
     private String jobPortal;
 
-    @Lob // For longer text fields that can hold URLs or long notes
+    @Lob
     private String jobLink;
+
+    // --- ADD THESE TWO FIELDS ---
+    @Lob // Use @Lob for potentially long URLs
+    private String jobPageUrl;
+    
+    @Lob // Use @Lob for potentially long URLs
+    private String additionalLink;
+    // ----------------------------
 
     @Lob
     private String resumeLink;
-    
-    @Lob // Added this field to handle "JOB PAGE" and other notes
-    private String notes; 
-    
-    private boolean mailSent;
 
     @Lob
+    private String notes;
+
+    @Column(name = "status")
+    private String status;
+    
+    @Column(name = "mail_sent")
+    private boolean mailSent;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    
+    private LocalDateTime updatedAt;
+    
+    @Column(name = "client_remark", columnDefinition = "TEXT")
     private String clientRemark;
 
-    // Link to the Client (the user the application is FOR)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_user_id", nullable = false)
-    private User client;
+    // ADD GETTERS AND SETTERS for clientRemark
+    public String getClientRemark() {
+        return clientRemark;
+    }
 
-    // Link to the User/Admin (the user who APPLIED)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "applied_by_user_id", nullable = false)
-    private User appliedBy;
+    public void setClientRemark(String clientRemark) {
+        this.clientRemark = clientRemark;
+    }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

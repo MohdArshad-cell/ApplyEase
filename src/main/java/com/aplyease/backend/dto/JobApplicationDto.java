@@ -13,10 +13,17 @@ public class JobApplicationDto {
     private LocalDate applicationDate;
     private String jobPortal;
     private String jobLink;
+    
+    // ADD THIS FIELD
+    private String jobPageUrl; 
+
     private String resumeLink;
+    
+    // ADD THIS FIELD
+    private String additionalLink; 
+
     private String notes;
     private boolean mailSent;
     
-    // The ID of the Client this application is FOR
     private Long clientId; 
 }

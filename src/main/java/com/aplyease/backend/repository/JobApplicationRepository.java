@@ -1,14 +1,26 @@
 package com.aplyease.backend.repository;
 
 import com.aplyease.backend.model.JobApplication;
-import com.aplyease.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
+@Repository
+public interface JobApplicationRepository extends JpaRepository<JobApplication, Long>, JpaSpecificationExecutor<JobApplication> {
 
-    // Custom method to find all applications for a specific client
-    List<JobApplication> findByClient(User client);
-    
+    // Methods to find applications
+    List<JobApplication> findByClientId(Long clientId);
+    List<JobApplication> findByAgentId(Long agentId);
+
+    // Method for the "Total Applications" stat
+    long countByAgentId(Long agentId);
+
+    // Method for counting by a SINGLE status ("Offer", "Rejected")
+    long countByAgentIdAndStatus(Long agentId, String status);
+
+    // Method for counting by a LIST of statuses ("In Progress")
+    long countByAgentIdAndStatusIn(Long agentId, List<String> statuses);
+
 }
