@@ -1,0 +1,7 @@
+LOAD DATABASE
+    FROM mysql://root:p0st25arr@host.docker.internal:3306/aplyease_db
+    INTO postgresql://postgres:P0st25arr@db.lkjtznixmzdfkxjrheiv.supabase.co:5432/postgres
+
+WITH include drop, create tables, create indexes, reset sequences
+
+SET search_path to 'public';

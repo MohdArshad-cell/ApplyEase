@@ -22,5 +22,5 @@ public interface JobApplicationRepository extends JpaRepository<JobApplication, 
 
     // Method for counting by a LIST of statuses ("In Progress")
     long countByAgentIdAndStatusIn(Long agentId, List<String> statuses);
-
+    long countByStatus(String status);
 }

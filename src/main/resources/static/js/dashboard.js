@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userRole.includes('ROLE_ADMIN')) {
         console.log("User is an Admin. Loading admin dashboard.");
         dashboardHtmlUrl = '/partials/dashboard-admin.html';
-        //dashboardScriptUrl = '/js/admin-dashboard-logic.js';
+        dashboardScriptUrl = '/js/admin-dashboard-logic.js';
 
     } else if (userRole.includes('ROLE_AGENT')) {
         console.log("User is an Agent. Loading agent dashboard.");

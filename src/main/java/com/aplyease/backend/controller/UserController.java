@@ -1,6 +1,6 @@
 package com.aplyease.backend.controller;
 
-import com.aplyease.backend.dto.ClientDto;
+
 import com.aplyease.backend.dto.UserDto;
 import com.aplyease.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +30,14 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
+ // In your controller (e.g., UserController.java or a new AgentController.java)
+
     @GetMapping("/clients")
-    @PreAuthorize("hasRole('AGENT')") 
-    public ResponseEntity<List<ClientDto>> getAllClients() {
-        List<ClientDto> clients = userService.getAllClients();
+    @PreAuthorize("hasRole('AGENT') or hasRole('ADMIN')")
+    // CHANGED: The method now returns a List<UserDto>
+    public ResponseEntity<List<UserDto>> getAllClients() {
+        // This will call the new method in your UserService
+        List<UserDto> clients = userService.getAllClients();
         return ResponseEntity.ok(clients);
     }
  // In UserController.java

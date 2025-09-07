@@ -34,7 +34,7 @@ public class JobApplication {
     @Column(name = "location")
     private String location;
 
-    @Column(name = "job_portal")
+    @Column(name = "job_portal") // Make sure the column name matches your DB
     private String jobPortal;
 
     @Lob

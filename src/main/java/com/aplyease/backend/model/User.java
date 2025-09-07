@@ -49,6 +49,10 @@ public class User implements UserDetails { // <-- Implement UserDetails here
         createdAt = LocalDateTime.now();
     }
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    // Add getters and setters for isActive
     // === START: Methods required by UserDetails Interface ===
 
     @Override

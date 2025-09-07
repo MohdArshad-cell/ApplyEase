@@ -1,0 +1,31 @@
+2025-09-06T16:21:48.012000Z LOG pgloader version "3.6.7~devel"
+2025-09-06T16:21:48.012000Z LOG Data errors in '/tmp/pgloader/'
+2025-09-06T16:21:48.012000Z LOG Parsing commands from file #P"/work/migrate-to-supabase.load"
+2025-09-06T16:21:49.112024Z LOG Migrating from #<MYSQL-CONNECTION mysql://root@host.docker.internal:3306/aplyease_db {1007E2E2A3}>
+2025-09-06T16:21:49.112024Z LOG Migrating into #<PGSQL-CONNECTION pgsql://postgres@db.lkjtznixmzdfkxjrheiv.supabase.co:5432/postgres {1007E2F753}>
+2025-09-06T16:22:18.626191Z LOG report summary reset
+              table name     errors       rows      bytes      total time
+------------------------  ---------  ---------  ---------  --------------
+         fetch meta data          0         19                     0.404s
+          Create Schemas          0          0                     0.156s
+        Create SQL Types          0          0                     0.312s
+           Create tables          0         10                     4.732s
+          Set Table OIDs          0          5                     0.152s
+------------------------  ---------  ---------  ---------  --------------
+aplyease_db.applications          0          8     2.1 kB          1.532s
+       aplyease_db.users          0          8     0.9 kB          1.472s
+  aplyease_db.user_roles          0          8     0.0 kB          1.376s
+       aplyease_db.roles          0          4     0.1 kB          1.508s
+     aplyease_db.clients          0          3     0.1 kB          2.928s
+------------------------  ---------  ---------  ---------  --------------
+ COPY Threads Completion          0          4                     2.952s
+          Create Indexes          0         10                     5.252s
+  Index Build Completion          0         10                     5.092s
+         Reset Sequences          0          4                     1.716s
+            Primary Keys          0          5                     4.416s
+     Create Foreign Keys          0          4                     3.256s
+         Create Triggers          0          0                     0.608s
+         Set Search Path          0          1                     1.544s
+        Install Comments          0          0                     0.000s
+------------------------  ---------  ---------  ---------  --------------
+       Total import time          ✓         31     3.2 kB         24.838s

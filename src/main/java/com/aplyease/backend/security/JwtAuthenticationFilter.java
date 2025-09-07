@@ -1,66 +1,82 @@
+// src/main/java/com/aplyease/backend/security/JwtAuthenticationFilter.java
+
 package com.aplyease.backend.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // Setup a logger for this class
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     @Autowired
     private JwtTokenProvider tokenProvider;
     
-    // We no longer need the CustomUserDetailsService here
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
+
+        log.info("AplyEase Auth: Intercepting request for {}", request.getRequestURI());
 
         String token = getJWTFromRequest(request);
 
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            String username = tokenProvider.getUsername(token);
+        if (StringUtils.hasText(token)) {
+            try {
+                // We wrap the logic in a try-catch to find validation errors
+                if (tokenProvider.validateToken(token)) {
+                    log.info("AplyEase Auth: JWT validation successful.");
+                    
+                    String username = tokenProvider.getUsername(token);
+                    
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        log.info("AplyEase Auth: Authenticating user '{}'.", username);
+                        
+                        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            // --- THIS IS THE CORRECTED LOGIC ---
-            // Get roles directly from the token's claims
-            Claims claims = Jwts.parser()
-                    .verifyWith(tokenProvider.key()) // Make sure key() in JwtTokenProvider is accessible (e.g., public)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                        );
+                        
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            // This must match the claim name we used in JwtTokenProvider
-            List<String> roles = claims.get("roles", List.class); 
-
-            // Convert role strings to Spring Security's SimpleGrantedAuthority objects
-            List<SimpleGrantedAuthority> authorities = roles.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-            // --- END OF CORRECTION ---
-
-            // Create the authentication token using the authorities from the token
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                username, null, authorities
-            );
-
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                        log.info("AplyEase Auth: Authentication successful. User '{}' has been set in SecurityContext.", username);
+                    }
+                }
+            } catch (ExpiredJwtException e) {
+                log.error("AplyEase Auth Error: JWT token is expired: {}", e.getMessage());
+            } catch (JwtException e) {
+                log.error("AplyEase Auth Error: JWT validation failed: {}", e.getMessage());
+            } catch (Exception e) {
+                log.error("AplyEase Auth Error: An unexpected error occurred during JWT processing.", e);
+            }
+        } else {
+            log.warn("AplyEase Auth: Request to {} did not contain a JWT Bearer token.", request.getRequestURI());
         }
 
         filterChain.doFilter(request, response);

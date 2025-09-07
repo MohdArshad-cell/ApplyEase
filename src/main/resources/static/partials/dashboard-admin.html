@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AplyEase</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* === AplyEase Admin Dashboard Stylesheet (Refactored) === */
+
+/* --- 1. Root Variables & Globals --- */
+:root {
+    --dark-bg: #0A0F1E;
+    --card-bg: rgba(10, 15, 30, 0.6);
+    --border-color: rgba(67, 97, 255, 0.2);
+    --text-primary: #FFFFFF;
+    --text-secondary: #8A93B1;
+    --accent-cyan: #00F6FF;
+    --accent-cyan-transparent: rgba(0, 246, 255, 0.1);
+}
+
+body { 
+    margin: 0; 
+    font-family: 'Poppins', sans-serif; 
+    background-color: var(--dark-bg); 
+    color: var(--text-primary); 
+}
+
+/* --- 2. Layout Containers --- */
+.page-container { min-height: 100vh; display: flex; flex-direction: column; }
+.content-wrapper { flex: 1; }
+.container { width: 100%; max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+.form-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 1.5rem; 
+}
+.form-section-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 0; }
+
+/* --- 3. Reusable Components (Cards & Buttons) --- */
+.glass-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 2rem;
+    overflow: hidden;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.1rem;
+    margin: 0 0.5rem;
+    padding: 0.25rem;
+    transition: color 0.2s ease-in-out;
+}
+.action-btn:hover {
+    color: var(--accent-cyan);
+}
+.action-btn i {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+/* --- 4. Page-Specific Sections --- */
+.stats-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: 1.5rem; 
+    margin-bottom: 2rem; 
+}
+.stat-card {
+    padding: 1.5rem; /* Override default card padding for a denser look */
+}
+.stat-card .value { font-size: 2rem; font-weight: 700; margin: 0; }
+.stat-card .label { color: var(--text-secondary); margin-bottom: 0.5rem; }
+.stat-card .subtext { font-size: 0.85rem; color: #25D366; }
+.value-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.icon-circle { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.icon-circle svg { width: 24px; height: 24px; }
+.icon-circle.icon-blue { background-color: rgba(80, 150, 255, 0.1); color: #5096ff; }
+.icon-circle.icon-green { background-color: rgba(37, 211, 102, 0.1); color: #25D366; }
+.icon-circle.icon-cyan { background-color: rgba(0, 255, 255, 0.1); color: var(--accent-cyan); }
+.icon-circle.icon-purple { background-color: rgba(142, 68, 173, 0.1); color: #8E44AD; }
+
+.dashboard-tabs {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+}
+.tab-link {
+    background: none; border: none; padding: 0.75rem 1.5rem; border-radius: 999px;
+    font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500;
+    color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease;
+}
+.tab-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.content-section {
+    margin-bottom: 2rem;
+}
+.content-section:last-child { margin-bottom: 0; }
+.content-section h3 { margin-top: 0; margin-bottom: 1.5rem; font-size: 1.25rem; }
+.placeholder-text { text-align: center; color: var(--text-secondary); padding: 3rem 0; font-size: 1.1rem; }
+
+/* --- Table, Filters & Pagination --- */
+.table-wrapper { overflow-x: auto; padding-bottom: 10px; }
+.table-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 2rem; width: 100%; }
+.table-filters { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.table-filters input, .table-filters select {
+    background-color: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px;
+    padding: 0.75rem 1rem; color: var(--text-primary); font-family: 'Poppins', sans-serif; min-width: 160px;
+}
+.table-filters select {
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; padding-right: 2.5rem;
+}
+.table-filters select option { background: #1a2035; color: var(--text-primary); }
+.applications-table { width: 100%; min-width: 1200px; border-collapse: collapse; }
+.applications-table th, .applications-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+.applications-table th { color: var(--text-secondary); font-size: 0.9rem; }
+.td-actions { text-align: center; }
+
+.pagination-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 1.5rem; margin-top: 1rem; border-top: 1px solid var(--border-color);
+    color: var(--text-secondary); font-size: 0.9rem;
+}
+.pagination-controls { display: flex; align-items: center; gap: 1.5rem; }
+.page-btn {
+    background-color: transparent; border: 1px solid var(--border-color); color: var(--text-secondary);
+    width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; transition: all 0.2s ease;
+}
+.page-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+.status-pill {
+    padding: 0.25rem 0.75rem; border-radius: 12px; font-weight: 500;
+    font-size: 0.8rem; text-align: center; display: inline-block;
+}
+.status-pill.status-active { background-color: rgba(37, 211, 102, 0.1); color: #25D366; }
+.status-pill.status-inactive { background-color: rgba(241, 196, 15, 0.1); color: #F1C40F; }
+
+/* --- Animations --- */
+@keyframes moveInCircle {
+  0% { transform: rotate(0deg); } 50% { transform: rotate(180deg); } 100% { transform: rotate(360deg); }
+}
+@keyframes moveHorizontal {
+  0% { transform: translateX(-50%); } 50% { transform: translateX(50%); } 100% { transform: translateX(-50%); }
+}
+.background-aurora { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+.background-aurora::before, .background-aurora::after {
+  content: ''; position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%;
+  background: rgba(0, 246, 255, 0.6); filter: blur(10vmax); animation-timing-function: linear;
+  animation-iteration-count: infinite; z-index: -1;
+}
+.background-aurora::before { top: 50%; left: 50%; transform-origin: 20vmax 20vmax; animation-name: moveInCircle; animation-duration: 25s; }
+.background-aurora::after { top: 50%; left: 20%; background: rgba(98, 72, 255, 0.6); transform-origin: -10vmax -10vmax; animation-name: moveHorizontal; animation-duration: 30s; }
+
+/* === Modal Styles (Redesigned with Glass & Scroll) === */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 1000; backdrop-filter: blur(5px);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.modal-overlay.visible { opacity: 1; pointer-events: auto; }
+
+.modal-content {
+    /* --- NEW: Glassmorphism Background --- */
+    background: rgba(16, 22, 42, 0.7); /* Semi-transparent */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    
+    /* --- FIX: Make modal scrollable to show buttons --- */
+    max-height: 90vh;
+    overflow-y: auto;
+
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.visible .modal-content { transform: scale(1); }
+
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.5rem; padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.modal-header h3 { margin: 0; font-size: 1.5rem; }
+.close-button { background: none; border: none; color: var(--text-secondary); font-size: 2rem; cursor: pointer; line-height: 1; }
+
+.modal-form .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.modal-form .form-group { display: flex; flex-direction: column; }
+.modal-form .form-group.full-width { grid-column: 1 / -1; }
+.modal-form .form-group label { margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem; }
+.modal-form .form-group label .required { color: #E53E3E; }
+
+.modal-form .form-group input, 
+.modal-form .form-group select, 
+.modal-form .form-group textarea {
+    width: 100%; padding: 0.75rem 1rem; border-radius: 8px; 
+    border: 1px solid var(--border-color);
+    background-color: var(--dark-bg); 
+    color: var(--text-primary); 
+    box-sizing: border-box; 
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Input Focus Glow Effect */
+.modal-form .form-group input:focus, 
+.modal-form .form-group select:focus, 
+.modal-form .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 246, 255, 0.2);
+}
+
+.modal-form .form-actions { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: 2rem; 
+    /* This makes the buttons stick to the bottom */
+    position: sticky;
+    bottom: -2rem; /* Aligns with the parent's padding */
+    background: inherit; /* Inherits the glass background */
+    padding: 1.5rem 0 0 0;
+}
+.modal-form .checkbox-group { flex-direction: row; align-items: center; gap: 0.75rem; }
+.modal-form .checkbox-group input[type="checkbox"] { width: 1.15em; height: 1.15em; }
+.modal-form .checkbox-group label { margin-bottom: 0; }
+
+.btn-secondary { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.7rem 1.5rem; font-weight: 600; }
+.btn-primary { background-color: var(--accent-cyan); color: var(--dark-bg); border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+.modal-error { /* Style for error messages */ }
+
+/* === Toast Notification === */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #25D366; /* Green for success */
+    color: var(--text-primary);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, bottom 0.3s;
+    z-index: 2000; /* Make sure it appears above other content */
+}
+.toast.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: 3rem;
+}
+/* Add to your existing CSS file */
+
+.view-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-item strong {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.detail-item a {
+    color: var(--accent-cyan);
+    text-decoration: none;
+    word-break: break-all; /* Prevents long links from overflowing */
+}
+
+.detail-item a:hover {
+    text-decoration: underline;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+/* Add to your CSS file */
+#password-group.hidden {
+    display: none;
+}
+    </style>
+</head>
+<body>
+    <div class="background-aurora"></div>
+    <div class="page-container">
+        <div id="navbar-placeholder"></div>
+        
+        <main class="content-wrapper">
+            <div class="container">
+
+                <div class="form-header">
+                    <h2 class="form-section-title">Admin Dashboard</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card glass-card">
+                        <p class="label">Total Applications</p>
+                        <div class="value-container">
+                            <p class="value" id="stats-total-applications">00</p>
+                            <div class="icon-circle icon-blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="subtext" id="stats-apps-today">+0 today</p>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <p class="label">Total Active Clients</p>
+                        <div class="value-container">
+                            <p class="value" id="stats-total-clients">00</p>
+                            <div class="icon-circle icon-purple">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7.5" r="4.5"></circle><line x1="23" y1="11" x2="17" y2="11"></line><line x1="20" y1="8" x2="20" y2="14"></line></svg>
+                            </div>
+                        </div>
+                        <p class="subtext">Platform-wide</p>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <p class="label">Total Active Agents</p>
+                        <div class="value-container">
+                            <p class="value" id="stats-total-agents">00</p>
+                            <div class="icon-circle icon-cyan">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            </div>
+                        </div>
+                        <p class="subtext">Platform-wide</p>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <p class="label">Successful Placements</p>
+                        <div class="value-container">
+                            <p class="value" id="stats-placements">00</p>
+                            <div class="icon-circle icon-green">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            </div>
+                        </div>
+                        <p class="subtext">Total Offers</p>
+                    </div>
+                </div>
+
+                <nav class="dashboard-tabs">
+                    <button class="tab-link active" data-tab="applications-panel">All Applications</button>
+                    <button class="tab-link" data-tab="usermgmt-panel">User Management</button>
+                    <button class="tab-link" data-tab="employee-panel">Employee Analytics</button>
+                    <button class="tab-link" data-tab="client-panel">Client Analytics</button>
+                </nav>
+   
+                <div id="applications-panel" class="content-section tab-panel active glass-card">
+                    <div class="table-toolbar">
+                        <h3>All Applications</h3>
+                        <div class="table-filters">
+                            <input type="search" placeholder="Search jobs, companies...">
+                            <select id="status-filter">
+                                <option value="">All Status</option>
+                                <option value="Applied">Applied</option>
+                                <option value="Interviewing">Interviewing</option>
+                                <option value="Offer">Offer</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                            <select id="agent-filter">
+                                <option value="">All Agents</option>
+                            </select>
+                            <select id="client-filter">
+                                <option value="">All Clients</option>
+                            </select>
+                            <button class="btn btn-outline">Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="applications-table">
+                            <thead>
+                                <tr>
+                                    <th>Date Applied</th>
+                                    <th>Applied By</th>
+                                    <th>Client</th>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>Status</th>
+                                    <th>Actions</th> 
+                                </tr>
+                            </thead>
+                            <tbody id="applications-table-body">
+                                <tr><td colspan="8" style="text-align: center; padding: 4rem;">Loading applications...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <footer class="pagination-footer">
+                        <div class="results-count">
+                            Showing 0 to 0 of 0 results
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="page-btn">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <span>Page 1 of 1</span>
+                            <button class="page-btn">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+
+               <div id="usermgmt-panel" class="content-section tab-panel glass-card">
+                    <div class="table-toolbar">
+                        <h3>User Management</h3>
+                        <div class="table-filters">
+                            <input type="search" id="user-search" placeholder="Search by name, email...">
+                            <select id="role-filter">
+                                <option value="">All Roles</option>
+                                <option value="AGENT">Agent</option>
+                                <option value="CLIENT">Client</option>
+                                <option value="USER">User</option>
+                            </select>
+                            <button class="btn btn-outline add-new-user-btn">Add New User</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="applications-table" id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th> 
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                     <footer class="pagination-footer" id="users-pagination">
+                        </footer>
+                </div>
+
+                <div id="employee-panel" class="content-section tab-panel glass-card">
+                    <h3>Employee Analytics</h3>
+                    <p class="placeholder-text">Charts and data for employee (agent) performance will be displayed here.</p>
+                </div>
+
+                <div id="client-panel" class="content-section tab-panel glass-card">
+                    <h3>Client Analytics</h3>
+                    <p class="placeholder-text">Charts and data related to client success rates will be displayed here.</p>
+                </div>
+                
+            </div>
+        </main>
+       
+        <div id="footer-placeholder"></div>
+    </div>
+    <div id="edit-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Edit Application</h3>
+            <button id="close-modal-btn" class="close-button">&times;</button>
+        </div>
+        <form id="edit-application-form" class="modal-form">
+            <input type="hidden" id="edit-application-id">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="edit-application-date">Date Applied <span class="required">*</span></label>
+                    <input type="date" id="edit-application-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-job-title">Job Title <span class="required">*</span></label>
+                    <input type="text" id="edit-job-title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit-company-name">Company <span class="required">*</span></label>
+                    <input type="text" id="edit-company-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-location">Location</label>
+                    <input type="text" id="edit-location">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-job-portal">Portal</label>
+                    <input type="text" id="edit-job-portal">
+                </div>
+                <div class="form-group">
+                    <label for="edit-status">Status</label>
+                    <select id="edit-status">
+                        <option value="Applied">Applied</option>
+                        <option value="Interviewing">Interviewing</option>
+                        <option value="Offer">Offer</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-job-link">Job Link</label>
+                    <input type="url" id="edit-job-link" placeholder="https://...">
+                </div>
+                 <div class="form-group">
+                    <label for="edit-job-page">Job Page URL</label>
+                    <input type="url" id="edit-job-page" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-resume-link">Resume URL</label>
+                    <input type="url" id="edit-resume-link" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label for="edit-additional-link">Additional Link</label>
+                    <input type="url" id="edit-additional-link" placeholder="https://...">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="edit-client-remark">Client Remark</label>
+                    <textarea id="edit-client-remark" rows="3"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="edit-notes">Notes</label>
+                    <textarea id="edit-notes" rows="3"></textarea>
+                </div>
+            </div>
+
+            <p id="modal-error-message" class="modal-error"></p>
+
+            <div class="form-actions">
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="edit-mail-sent">
+                    <label for="edit-mail-sent">Mail Sent</label>
+                </div>
+                <div>
+                    <button type="button" id="cancel-edit-btn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Update Application</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="view-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Application Details</h3>
+            <button id="close-view-modal-btn" class="close-button">&times;</button>
+        </div>
+        <div id="view-modal-body" class="view-details-grid">
+            </div>
+    </div>
+</div>
+
+<div id="user-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="user-modal-title">Add New User</h3>
+            <button id="close-user-modal-btn" class="close-button">&times;</button>
+        </div>
+        <form id="user-form" class="modal-form">
+            <input type="hidden" id="edit-user-id">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="user-first-name">First Name <span class="required">*</span></label>
+                    <input type="text" id="user-first-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-last-name">Last Name <span class="required">*</span></label>
+                    <input type="text" id="user-last-name" required>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="user-email">Email <span class="required">*</span></label>
+                    <input type="email" id="user-email" required>
+                </div>
+
+                <div id="password-group" class="form-group full-width">
+                    <label for="user-password">Password <span class="required">*</span></label>
+                    <input type="password" id="user-password" required>
+                </div>
+
+                <div class="form-group">
+    <label for="user-role">Role <span class="required">*</span></label>
+    <select id="user-role" required>
+        <option value="ROLE_AGENT">Agent</option>
+        <option value="ROLE_CLIENT">Client</option>
+        <option value="ROLE_USER">User</option>
+    </select>
+</div>
+            </div>
+
+            <p id="user-modal-error" class="modal-error"></p>
+
+            <div class="form-actions">
+                <button type="button" id="cancel-user-btn" class="btn-secondary">Cancel</button>
+                <button type="submit" id="user-form-submit-btn" class="btn-primary">Add User</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="toast-notification" class="toast"></div>
+    <script src="/js/admin-dashboard-logic.js"></script>
+</body>
+</html> 
