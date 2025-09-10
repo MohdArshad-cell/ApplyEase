@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* === AplyEase Admin Dashboard Stylesheet (Refactored) === */
 
@@ -263,7 +264,7 @@ body {
 .btn-secondary { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 0.7rem 1.5rem; font-weight: 600; }
 .btn-primary { background-color: var(--accent-cyan); color: var(--dark-bg); border: none; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
-.modal-error { /* Style for error messages */ }
+
 
 /* === Toast Notification === */
 .toast {
@@ -322,6 +323,102 @@ body {
 /* Add to your CSS file */
 #password-group.hidden {
     display: none;
+}
+/* === Employee Analytics Leaderboard Styles === */
+.analytics-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+.analytics-table th {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-align: left;
+    padding: 0 1rem 0.5rem 1rem;
+}
+
+.analytics-table tbody tr {
+    background-color: rgba(10, 15, 30, 0.5);
+    border-radius: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer; /* Combined from the duplicate rule */
+}
+
+.analytics-table tbody tr:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.analytics-table td {
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+.analytics-table td:first-child { border-left: 1px solid var(--border-color); border-radius: 10px 0 0 10px; }
+.analytics-table td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 10px 10px 0; }
+
+.rank-col { width: 5%; }
+.rate-col { width: 25%; }
+
+.rank {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: center;
+}
+.rank.rank-1 { color: #FFD700; } /* Gold */
+.rank.rank-2 { color: #C0C0C0; } /* Silver */
+.rank.rank-3 { color: #CD7F32; } /* Bronze */
+
+.agent-info { display: flex; align-items: center; gap: 1rem; }
+.avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background-color: var(--accent-cyan); color: var(--dark-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; flex-shrink: 0;
+}
+.agent-info .name { font-weight: 600; color: var(--text-primary); }
+
+.progress-bar { background-color: rgba(255, 255, 255, 0.1); border-radius: 99px; height: 10px; width: 100%; }
+.progress-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease-in-out; }
+.progress-bar-fill.high { background: linear-gradient(90deg, #25D366, #00F6FF); }
+.progress-bar-fill.medium { background: linear-gradient(90deg, #FFC107, #FF9800); }
+.progress-bar-fill.low { background: linear-gradient(90deg, #F44336, #E91E63); }
+.success-rate-text { font-weight: 600; margin-left: 1rem; }
+
+/* === Modal & Chart Styles === */
+.sub-header { /* Consolidated rule */
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#agent-report-body .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 1.5rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.chart-container {
+    padding: 1.5rem;
+}
+
+.chart-container h4 { /* Matched to the H4 in the HTML */
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
 }
     </style>
 </head>
@@ -450,9 +547,9 @@ body {
                             <input type="search" id="user-search" placeholder="Search by name, email...">
                             <select id="role-filter">
                                 <option value="">All Roles</option>
-                                <option value="AGENT">Agent</option>
-                                <option value="CLIENT">Client</option>
-                                <option value="USER">User</option>
+                                <option value="ROLE_AGENT">Agent</option>
+                                <option value="ROLE_CLIENT">Client</option>
+                                <option value="ROLE_ADMIN">ADMIN</option>
                             </select>
                             <button class="btn btn-outline add-new-user-btn">Add New User</button>
                         </div>
@@ -477,10 +574,59 @@ body {
                         </footer>
                 </div>
 
-                <div id="employee-panel" class="content-section tab-panel glass-card">
-                    <h3>Employee Analytics</h3>
-                    <p class="placeholder-text">Charts and data for employee (agent) performance will be displayed here.</p>
-                </div>
+               <div id="employee-panel" class="content-section tab-panel glass-card">
+    
+    <div class="analytics-header">
+        <h3>Employee Performance</h3>
+        <div class="view-toggle">
+            <input type="radio" id="view-leaderboard" name="analytics-view" value="leaderboard" checked>
+            <label for="view-leaderboard"><i class="fa-solid fa-list-ol"></i> Leaderboard</label>
+            
+            <input type="radio" id="view-dashboard" name="analytics-view" value="dashboard">
+            <label for="view-dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</label>
+        </div>
+        <div class="table-filters">
+            <select id="analytics-period-filter">
+                <option value="ALL_TIME">All Time</option>
+                <option value="LAST_30_DAYS">Last 30 Days</option>
+                <option value="LAST_7_DAYS">Last 7 Days</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="leaderboard-view" class="analytics-view">
+        <div class="table-wrapper">
+            <table class="analytics-table">
+                <thead>
+                    <tr>
+                        <th class="rank-col">#</th>
+                        <th>Agent</th>
+                        <th>Total Applications</th>
+                        <th>Successful Placements</th>
+                        <th class="rate-col">Success Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="analytics-table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="analytics-view" style="display: none;">
+        <div class="charts-grid">
+            <div class="chart-container glass-card">
+                <h4>Applications Submitted</h4>
+                <canvas id="applications-chart"></canvas>
+            </div>
+            <div class="chart-container glass-card">
+                <h4>Success Rate</h4>
+                <canvas id="success-rate-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    </div>
+
 
                 <div id="client-panel" class="content-section tab-panel glass-card">
                     <h3>Client Analytics</h3>
@@ -622,7 +768,7 @@ body {
     <select id="user-role" required>
         <option value="ROLE_AGENT">Agent</option>
         <option value="ROLE_CLIENT">Client</option>
-        <option value="ROLE_USER">User</option>
+        <option value="ROLE_USER">ADMIN</option>
     </select>
 </div>
             </div>
@@ -634,6 +780,17 @@ body {
                 <button type="submit" id="user-form-submit-btn" class="btn-primary">Add User</button>
             </div>
         </form>
+    </div>
+</div>
+
+<div id="agent-report-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="agent-report-title">Agent Report</h3>
+            <button id="close-agent-report-btn" class="close-button">&times;</button>
+        </div>
+        <div id="agent-report-body">
+            </div>
     </div>
 </div>
 <div id="toast-notification" class="toast"></div>

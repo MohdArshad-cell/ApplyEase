@@ -2,7 +2,10 @@ package com.aplyease.backend.controller;
 
 import com.aplyease.backend.dto.AdminApplicationDto;
 import com.aplyease.backend.dto.AdminDashboardStatsDto;
+import com.aplyease.backend.dto.AgentAnalyticsDto;
+import com.aplyease.backend.dto.AgentDetailAnalyticsDto;
 import com.aplyease.backend.dto.ApplicationUpdateRequestDto;
+import com.aplyease.backend.dto.EmployeeDashboardDto;
 import com.aplyease.backend.dto.StatusUpdateDto;
 import com.aplyease.backend.dto.UserCreateRequestDto;
 import com.aplyease.backend.dto.UserDto;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
@@ -103,4 +107,23 @@ public class AdminController {
         adminService.toggleUserStatus(id, statusUpdate.isActive());
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/analytics/agents")
+    public ResponseEntity<List<AgentAnalyticsDto>> getAgentAnalytics(
+            @RequestParam(name = "period", defaultValue = "ALL_TIME") String period) {
+                
+        List<AgentAnalyticsDto> analytics = adminService.getAgentAnalytics(period);
+        return ResponseEntity.ok(analytics);
+    }
+    
+    @GetMapping("/analytics/agent/{id}")
+    public ResponseEntity<AgentDetailAnalyticsDto> getAgentDetailAnalytics(@PathVariable Long id) {
+        AgentDetailAnalyticsDto analytics = adminService.getAgentDetailAnalytics(id);
+        return ResponseEntity.ok(analytics);
+    }
+    
+
+ @GetMapping("/analytics/employee-dashboard")
+ public ResponseEntity<EmployeeDashboardDto> getEmployeeDashboard() {
+     return ResponseEntity.ok(adminService.getEmployeeDashboardAnalytics());
+ }
 }

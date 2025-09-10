@@ -2,7 +2,12 @@ package com.aplyease.backend.service.impl;
 
 import com.aplyease.backend.dto.AdminApplicationDto;
 import com.aplyease.backend.dto.AdminDashboardStatsDto;
+import com.aplyease.backend.dto.AgentAnalyticsDto;
+import com.aplyease.backend.dto.AgentDetailAnalyticsDto;
+import com.aplyease.backend.dto.AgentPerformanceDto;
+import com.aplyease.backend.dto.ApplicationSummaryDto;
 import com.aplyease.backend.dto.ApplicationUpdateRequestDto;
+import com.aplyease.backend.dto.EmployeeDashboardDto;
 import com.aplyease.backend.dto.UserCreateRequestDto;
 import com.aplyease.backend.dto.UserDto;
 import com.aplyease.backend.dto.UserUpdateRequestDto;
@@ -15,6 +20,8 @@ import com.aplyease.backend.repository.RoleRepository;
 import com.aplyease.backend.repository.UserRepository;
 import com.aplyease.backend.service.AdminService;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -156,6 +163,121 @@ this.passwordEncoder = passwordEncoder;
         user.setActive(isActive);
         userRepository.save(user);
     }
+    
+    @Override
+    public List<AgentAnalyticsDto> getAgentAnalytics(String period) {
+        // Determine the start date based on the period string
+        LocalDate startDate = null;
+        switch (period.toUpperCase()) {
+            case "LAST_7_DAYS":
+                startDate = LocalDate.now().minusDays(7);
+                break;
+            case "LAST_30_DAYS":
+                startDate = LocalDate.now().minusDays(30);
+                break;
+            case "ALL_TIME":
+            default:
+                // No start date means we get all records
+                break;
+        }
+
+        List<User> agents = userRepository.findByRoles_Name("ROLE_AGENT");
+        
+        final LocalDate finalStartDate = startDate; // Final variable for use in lambda
+        return agents.stream().map(agent -> {
+            long agentId = agent.getId();
+            String agentName = agent.getFirstName() + " " + agent.getLastName();
+            
+            long totalApplications;
+            long totalOffers;
+
+            // Use the correct repository method based on whether a start date was set
+            if (finalStartDate != null) {
+                totalApplications = jobApplicationRepository.countByAgentIdAndApplicationDateAfter(agentId, finalStartDate);
+                totalOffers = jobApplicationRepository.countByAgentIdAndStatusAndApplicationDateAfter(agentId, "Offer", finalStartDate);
+            } else {
+                totalApplications = jobApplicationRepository.countByAgentId(agentId);
+                totalOffers = jobApplicationRepository.countByAgentIdAndStatus(agentId, "Offer");
+            }
+            
+            return new AgentAnalyticsDto(agentId, agentName, totalApplications, totalOffers);
+        }).collect(Collectors.toList());
+    }
+    
+    @Override
+    public AgentDetailAnalyticsDto getAgentDetailAnalytics(Long agentId) {
+        // 1. Find the agent or throw an error
+        User agent = userRepository.findById(agentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agent not found with id: " + agentId));
+
+        // 2. Calculate summary stats for this agent
+        long totalApplications = jobApplicationRepository.countByAgentId(agentId);
+        long totalOffers = jobApplicationRepository.countByAgentIdAndStatus(agentId, "Offer");
+        double successRate = (totalApplications > 0) ? ((double) totalOffers / totalApplications) * 100 : 0.0;
+
+        // 3. Fetch the 10 most recent applications
+        List<JobApplication> recentApplications = jobApplicationRepository.findTop10ByAgentIdOrderByApplicationDateDesc(agentId);
+        
+        // 4. Convert the recent applications to a simpler DTO list
+        List<ApplicationSummaryDto> recentApplicationSummaries = recentApplications.stream()
+                .map(app -> new ApplicationSummaryDto(
+                    app.getApplicationId(),
+                    app.getJobTitle(),
+                    app.getCompanyName(),
+                    app.getStatus(),
+                    app.getApplicationDate()))
+                .collect(Collectors.toList());
+
+        // 5. Assemble the final detailed DTO
+        AgentDetailAnalyticsDto detailsDto = new AgentDetailAnalyticsDto();
+        detailsDto.setAgentId(agent.getId());
+        detailsDto.setAgentName(agent.getFirstName() + " " + agent.getLastName());
+        detailsDto.setTotalApplications(totalApplications);
+        detailsDto.setTotalOffers(totalOffers);
+        detailsDto.setSuccessRate(successRate);
+        detailsDto.setRecentApplications(recentApplicationSummaries);
+
+        return detailsDto;
+    }
+    
+    
+ // Add this new method
+    @Override
+    public EmployeeDashboardDto getEmployeeDashboardAnalytics() {
+        EmployeeDashboardDto dashboardData = new EmployeeDashboardDto();
+
+        // Calculate stat card data
+        List<User> agents = userRepository.findByRoles_Name("ROLE_AGENT");
+        
+        System.out.println("DEBUG: Found " + agents.size() + " agents.");
+        dashboardData.setActiveEmployees(agents.size());
+       
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDaysAgo = today.minusDays(7);
+        long totalApplications = jobApplicationRepository.count();
+        
+        // NOTE: This assumes a simple payout model. You can adjust the logic as needed.
+        dashboardData.setTotalPayout(totalApplications * 0.20);
+        
+        dashboardData.setTodaySubmissions(jobApplicationRepository.countByApplicationDateAfter(today.minusDays(1)));
+        dashboardData.setThisWeekSubmissions(jobApplicationRepository.countByApplicationDateAfter(sevenDaysAgo));
+        dashboardData.setDailyAverage(agents.isEmpty() ? 0 : (double) dashboardData.getThisWeekSubmissions() / 7.0);
+
+        // Calculate performance list for charts
+        List<AgentPerformanceDto> performanceList = agents.stream().map(agent -> {
+            long totalApps = jobApplicationRepository.countByAgentId(agent.getId());
+            long totalOffers = jobApplicationRepository.countByAgentIdAndStatus(agent.getId(), "Offer");
+            double successRate = (totalApps > 0) ? ((double) totalOffers / totalApps) * 100 : 0;
+            return new AgentPerformanceDto(agent.getFirstName() + " " + agent.getLastName(), totalApps, successRate);
+        }).collect(Collectors.toList());
+
+        dashboardData.setPerformanceList(performanceList);
+        
+        return dashboardData;
+    }
+
+    // You will also need to add this new method to your JobApplicationRepository
+    // long countByApplicationDateAfter(LocalDate startDate);
  // In AdminServiceImpl.java
 
     // --- Helper Methods ---

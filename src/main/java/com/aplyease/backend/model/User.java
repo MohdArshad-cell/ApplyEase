@@ -91,7 +91,7 @@ public class User implements UserDetails { // <-- Implement UserDetails here
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isActive;
     }
     
     // === END: Implemented Methods ===

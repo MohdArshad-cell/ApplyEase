@@ -414,39 +414,322 @@ async function toggleUserStatus(userId, currentIsActive) {
     }
 }
 function setupActionListeners() {
-    // MODIFIED: Listener is now attached to the whole document for reliability
     document.addEventListener('click', (event) => {
+        // --- First, check for a click on an Action Button or Add User Button ---
         const button = event.target.closest('.action-btn, .add-new-user-btn');
-        if (!button) return; // Exit if the click wasn't on a relevant button
+        if (button) {
+            const action = button.title;
+            const parentTd = button.closest('.td-actions');
+            
+            // Handle Add New User button specifically
+            if (button.matches('.add-new-user-btn')) {
+                openUserModal();
+                return; // Action handled, exit
+            }
 
-        const action = button.title;
-        const parentTd = button.closest('.td-actions'); // Find the parent table cell
-        
-        // --- Handle Add New User Button ---
-        if (button.matches('.add-new-user-btn')) {
-            openUserModal();
-            return; // Action handled, exit
+            // Handle actions within table rows
+            if (parentTd) {
+                const id = parentTd.dataset.id;
+                if (button.closest('#applications-panel')) {
+                    if (action === 'Edit Application') openEditModal(id);
+                    else if (action === 'Delete Application') deleteApplication(id);
+                    else if (action === 'View Details') openViewModal(id);
+                } else if (button.closest('#usermgmt-panel')) {
+                    const isActive = parentTd.dataset.active === 'true';
+                    if (action === 'Edit User') openUserModal(id);
+                    else if (action === 'Toggle Status') toggleUserStatus(id, isActive);
+                }
+            }
+            return; // A button was clicked, so we are done.
         }
 
-        // The rest of the logic requires an ID from the table row
-        if (!parentTd) return;
-        const id = parentTd.dataset.id;
-
-        // --- Handle Application Actions ---
-        if (button.closest('#applications-panel')) {
-            if (action === 'Edit Application') openEditModal(id);
-            else if (action === 'Delete Application') deleteApplication(id);
-            else if (action === 'View Details') openViewModal(id);
-        }
-
-        // --- Handle User Actions ---
-        if (button.closest('#usermgmt-panel')) {
-            const isActive = parentTd.dataset.active === 'true';
-            if (action === 'Edit User') openUserModal(id);
-            else if (action === 'Toggle Status') toggleUserStatus(id, isActive);
+        // --- If no button was clicked, check for a click on an Analytics Table Row ---
+        const analyticsRow = event.target.closest('#employee-panel tbody tr');
+        if (analyticsRow && analyticsRow.dataset.agentId) {
+            const agentId = analyticsRow.dataset.agentId;
+            openAgentDrillDownModal(agentId);
         }
     });
 }
+
+// --- Agent Analytics Table ---
+// MODIFIED: The function now accepts a 'period' parameter with a default value.
+async function loadAgentAnalytics(period = 'ALL_TIME') {
+    const tableBody = document.getElementById('analytics-table-body');
+    showTableMessage(tableBody, 'Loading analytics...', 4); // Colspan is 4
+
+    try {
+        // The 'period' variable is now correctly defined and used here.
+        const response = await fetchWithAuth(`/api/admin/analytics/agents?period=${period}`);
+        if (!response.ok) throw new Error('Failed to load analytics');
+        const analyticsData = await response.json();
+        renderAgentAnalyticsTable(analyticsData);
+    } catch (error) {
+        console.error('Error loading agent analytics:', error);
+        showTableMessage(tableBody, 'Failed to load analytics.', 4);
+    }
+}
+
+function renderAgentAnalyticsTable(analyticsData) {
+    const tableBody = document.getElementById('analytics-table-body');
+    tableBody.innerHTML = '';
+    if (!analyticsData || analyticsData.length === 0) {
+        showTableMessage(tableBody, 'No agent data found.', 5); // Colspan is now 5
+        return;
+    }
+
+    // Sort by success rate to determine rank
+    analyticsData.sort((a, b) => b.successRate - a.successRate);
+
+    analyticsData.forEach((agent, index) => {
+        const row = document.createElement('tr');
+		row.dataset.agentId = agent.agentId; 
+		    const rank = index + 1;
+        const successRate = agent.successRate.toFixed(1);
+
+        // Determine color class for progress bar
+        let rateColorClass = 'low';
+        if (successRate >= 75) {
+            rateColorClass = 'high';
+        } else if (successRate >= 40) {
+            rateColorClass = 'medium';
+        }
+
+        // Generate agent initials for the avatar
+        const nameParts = agent.agentName.split(' ');
+        const initials = (nameParts[0] ? nameParts[0][0] : '') + (nameParts[1] ? nameParts[1][0] : '');
+
+        row.innerHTML = `
+            <td><div class="rank rank-${rank}">${rank}</div></td>
+            <td>
+                <div class="agent-info">
+                    <div class="avatar">${initials.toUpperCase()}</div>
+                    <span class="name">${agent.agentName}</span>
+                </div>
+            </td>
+            <td>${agent.totalApplications}</td>
+            <td>${agent.totalOffers}</td>
+            <td>
+                <div style="display: flex; align-items: center;">
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill ${rateColorClass}" style="width: ${successRate}%;"></div>
+                    </div>
+                    <span class="success-rate-text">${successRate}%</span>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+// Add these new functions to your JS file
+
+
+// --- NEW, REFACTORED AGENT REPORT MODAL LOGIC ---
+
+async function openAgentReportModal(agentId) {
+    const reportModal = document.getElementById('agent-report-modal');
+    if (!reportModal) return;
+
+    reportModal.classList.add('visible');
+    const modalBody = document.getElementById('agent-report-body');
+    modalBody.innerHTML = '<p>Loading agent report...</p>';
+
+    try {
+        const response = await fetchWithAuth(`/api/admin/analytics/agent/${agentId}`);
+        if (!response.ok) throw new Error('Could not load agent report.');
+        
+        const data = await response.json();
+
+        // Set the title
+        document.getElementById('agent-report-title').textContent = `${data.agentName}'s Report`;
+        
+        // Build the full modal content
+        const statsHTML = `
+            <div class="stats-grid">
+                <div class="stat-card glass-card"><p class="label">Total Applications</p><p class="value">${data.totalApplications}</p></div>
+                <div class="stat-card glass-card"><p class="label">Total Offers</p><p class="value">${data.totalOffers}</p></div>
+                <div class="stat-card glass-card"><p class="label">Success Rate</p><p class="value">${data.successRate.toFixed(1)}%</p></div>
+            </div>`;
+            
+        const recentAppsHTML = (data.recentApplications && data.recentApplications.length > 0)
+            ? data.recentApplications.map(app => `
+                <tr>
+                    <td>${app.applicationDate}</td>
+                    <td>${app.jobTitle}</td>
+                    <td>${app.companyName}</td>
+                    <td>${app.status}</td>
+                </tr>`).join('')
+            : '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No recent applications found.</td></tr>';
+
+        const tableHTML = `
+            <h4 class="sub-header">Recent Applications</h4>
+            <div class="table-wrapper">
+                <table class="applications-table">
+                    <thead><tr><th>Date</th><th>Job Title</th><th>Company</th><th>Status</th></tr></thead>
+                    <tbody>${recentAppsHTML}</tbody>
+                </table>
+            </div>`;
+
+        modalBody.innerHTML = statsHTML + tableHTML;
+
+    } catch (error) {
+        console.error(error);
+        modalBody.innerHTML = `<p style="color: red;">${error.message}</p>`;
+    }
+}
+
+function closeAgentReportModal() {
+    const reportModal = document.getElementById('agent-report-modal');
+    if (reportModal) {
+        reportModal.classList.remove('visible');
+    }
+}
+async function openAgentDrillDownModal(agentId) {
+    const drilldownModal = document.getElementById('agent-report-modal');
+    if (!drilldownModal) return;
+
+    drilldownModal.classList.add('visible');
+    const modalBody = document.getElementById('agent-report-body');
+    modalBody.innerHTML = '<p>Loading agent report...</p>';
+
+    try {
+        const response = await fetchWithAuth(`/api/admin/analytics/agent/${agentId}`);
+        if (!response.ok) throw new Error('Could not load agent report.');
+        
+        const data = await response.json();
+
+        // Set the title
+        document.getElementById('agent-report-title').textContent = `${data.agentName}'s Report`;
+        
+        // Build the full modal content
+        const statsHTML = `
+            <div class="stats-grid">
+                <div class="stat-card glass-card"><p class="label">Total Applications</p><p class="value">${data.totalApplications}</p></div>
+                <div class="stat-card glass-card"><p class="label">Total Offers</p><p class="value">${data.totalOffers}</p></div>
+                <div class="stat-card glass-card"><p class="label">Success Rate</p><p class="value">${data.successRate.toFixed(1)}%</p></div>
+            </div>`;
+            
+        const recentAppsHTML = (data.recentApplications && data.recentApplications.length > 0)
+            ? data.recentApplications.map(app => `
+                <tr>
+                    <td>${app.applicationDate}</td>
+                    <td>${app.jobTitle}</td>
+                    <td>${app.companyName}</td>
+                    <td>${app.status}</td>
+                </tr>`).join('')
+            : '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No recent applications found.</td></tr>';
+
+        const tableHTML = `
+            <h4 class="sub-header">Recent Applications</h4>
+            <div class="table-wrapper">
+                <table class="applications-table">
+                    <thead><tr><th>Date</th><th>Job Title</th><th>Company</th><th>Status</th></tr></thead>
+                    <tbody>${recentAppsHTML}</tbody>
+                </table>
+            </div>`;
+
+        modalBody.innerHTML = statsHTML + tableHTML;
+
+    } catch (error) {
+        console.error(error);
+        modalBody.innerHTML = `<p style="color: red;">${error.message}</p>`;
+    }
+}
+
+function closeAgentDrillDownModal() {
+    const drilldownModal = document.getElementById('agent-report-modal');
+    if (drilldownModal) {
+        drilldownModal.classList.remove('visible');
+    }
+}
+
+// Add these at the top of your file with the other chart variables
+let applicationsChartInstance = null;
+let successRateChartInstance = null;
+
+// REPLACE your old loadAgentAnalytics function with this
+async function loadEmployeeDashboard() {
+    const analyticsPanel = document.getElementById('employee-panel');
+    analyticsPanel.classList.add('loading'); // Optional: for a loading state
+
+    try {
+        const response = await fetchWithAuth('/api/admin/analytics/employee-dashboard');
+        if (!response.ok) throw new Error('Failed to load analytics dashboard.');
+        
+        const data = await response.json();
+
+        // Populate Stat Cards
+        document.getElementById('stats-payout').textContent = `$${data.totalPayout.toFixed(2)}`;
+        document.getElementById('stats-active-employees').textContent = `${data.activeEmployees} active employees`;
+        document.getElementById('stats-this-week').textContent = data.thisWeekSubmissions;
+        document.getElementById('stats-today').textContent = data.todaySubmissions;
+        document.getElementById('stats-daily-avg').textContent = data.dailyAverage.toFixed(1);
+
+        // Render Charts
+        renderApplicationsChart(data.performanceList);
+        renderSuccessRateChart(data.performanceList);
+
+    } catch (error) {
+        console.error("Error loading employee dashboard:", error);
+    } finally {
+        analyticsPanel.classList.remove('loading');
+    }
+}
+
+// REPLACE your old render...Chart functions with these
+function renderApplicationsChart(performanceData) {
+    const ctx = document.getElementById('applications-chart')?.getContext('2d');
+    if (!ctx) return;
+    if (applicationsChartInstance) applicationsChartInstance.destroy();
+
+    applicationsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: performanceData.map(p => p.agentName),
+            datasets: [{
+                label: 'Applications Submitted',
+                data: performanceData.map(p => p.totalSubmissions),
+                backgroundColor: 'rgba(0, 246, 255, 0.6)',
+                borderColor: 'rgba(0, 246, 255, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+             scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { color: 'rgba(255,255,255,0.1)' } } },
+             plugins: { legend: { display: false } }
+        }
+    });
+}
+
+
+function renderSuccessRateChart(performanceData) {
+    const ctx = document.getElementById('success-rate-chart')?.getContext('2d');
+    if (!ctx) return;
+    if (successRateChartInstance) successRateChartInstance.destroy();
+
+    successRateChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: performanceData.map(p => p.agentName),
+            datasets: [{
+                label: 'Success Rate (%)',
+                data: performanceData.map(p => p.successRate),
+                backgroundColor: 'rgba(37, 211, 102, 0.6)',
+                borderColor: 'rgba(37, 211, 102, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { color: 'rgba(255,255,255,0.1)' } } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+// In your initAdminDashboard function, UPDATE the tab switching logic
+// to call the new loadEmployeeDashboard function
 
 //======================================================================
 // FILTERS & EVENT LISTENERS
@@ -549,44 +832,74 @@ function setupFilters() {
 // INITIALIZATION
 //======================================================================
 function initAdminDashboard() {
+    // 1. Initial Data Loading
     loadDashboardStats();
     loadAllApplications();
     loadAllUsers();
     
+    // 2. Flag for Lazy Loading Analytics
+    let analyticsLoaded = false;
+
+    // 3. Tab Switching & Lazy Loading Logic
     const tabs = document.querySelectorAll('.tab-link');
     const panels = document.querySelectorAll('.tab-panel');
+
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            // This is the click handler where the 'tab' variable exists.
+
+            // Switch active tab visuals
             tabs.forEach(t => t.classList.remove('active'));
             panels.forEach(p => p.classList.remove('active'));
             tab.classList.add('active');
             const targetPanel = document.getElementById(tab.dataset.tab);
-            if (targetPanel) targetPanel.classList.add('active');
+            if (targetPanel) {
+                targetPanel.classList.add('active');
+            }
+
+            // Lazy-load analytics data when that tab is clicked for the first time.
+            // This logic MUST be inside the click handler.
+            if (tab.dataset.tab === 'employee-panel' && !analyticsLoaded) {
+                loadAgentAnalytics();
+                analyticsLoaded = true;
+            }
+			
+			if (tab.dataset.tab === 'employee-panel' && !analyticsLoaded) {
+			            loadEmployeeAnalytics(); // Call the new, correct function
+			            analyticsLoaded = true;
+			        }
         });
     });
 
+    // 4. Setup Filters and Action Listeners
     setupFilters();
     setupActionListeners();
 
-    // Event listeners for Edit Application Modal
-    document.getElementById('close-modal-btn').addEventListener('click', closeEditModal);
-    document.getElementById('cancel-edit-btn').addEventListener('click', closeEditModal);
-    editForm.addEventListener('submit', handleEditFormSubmit);
+    // 5. Event Listeners for Modals
+    // (Assuming all your modal elements exist in the HTML)
+    const editForm = document.getElementById('edit-application-form');
+    const userForm = document.getElementById('user-form');
+    
+    document.getElementById('close-modal-btn')?.addEventListener('click', closeEditModal);
+    document.getElementById('cancel-edit-btn')?.addEventListener('click', closeEditModal);
+    if(editForm) editForm.addEventListener('submit', handleEditFormSubmit);
 
-    // Event listeners for View Application Modal
-	document.getElementById('close-view-modal-btn').addEventListener('click', closeViewModal);
+    document.getElementById('close-view-modal-btn')?.addEventListener('click', closeViewModal);
+    
+    document.getElementById('close-user-modal-btn')?.addEventListener('click', closeUserModal);
+    document.getElementById('cancel-user-btn')?.addEventListener('click', closeUserModal);
+    if(userForm) userForm.addEventListener('submit', handleUserFormSubmit);
 
-    // Event listeners for Add/Edit User Modal
-	document.getElementById('close-user-modal-btn').addEventListener('click', closeUserModal);
-	document.getElementById('cancel-user-btn').addEventListener('click', closeUserModal);
-	userForm.addEventListener('submit', handleUserFormSubmit);
-	   
-    // Ensure the "Add New User" button has the correct class for the listener
-	const addNewUserBtn = document.querySelector('#usermgmt-panel .btn-outline');
-	if (addNewUserBtn) {
-	    addNewUserBtn.classList.add('add-new-user-btn');
-	}
+    document.getElementById('close-agent-report-btn')?.addEventListener('click', closeAgentReportModal);
+    
+    const periodFilter = document.getElementById('analytics-period-filter');
+    if (periodFilter) {
+        periodFilter.addEventListener('change', () => {
+            const selectedPeriod = periodFilter.value;
+            loadAgentAnalytics(selectedPeriod);
+        });
+    }
+	
 }
-
 // --- Run the App ---
 initAdminDashboard();
