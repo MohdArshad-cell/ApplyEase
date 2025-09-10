@@ -2,7 +2,8 @@
 console.log("✅ agent-dashboard-logic.js loaded");
 let allApplications = [];
 // --- NEW: Define a single base URL for all API calls ---
-const API_BASE_URL = 'http://localhost:8080';
+// AFTER (Correct for production)
+const API_BASE_URL = 'https://applyease-6ell.onrender.com';
 
 // Single token check and redirect
 const token = localStorage.getItem('accessToken');

@@ -4,7 +4,7 @@
 let allApplications = [];
 
 // Base URL for the API
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://applyease-6ell.onrender.com';
 
 // --- INITIALIZATION ---
 function initClientDashboard() {
