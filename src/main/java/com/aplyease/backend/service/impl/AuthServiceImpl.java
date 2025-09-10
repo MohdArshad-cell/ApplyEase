@@ -16,11 +16,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class AuthServiceImpl implements AuthService {
-
+	private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -63,9 +66,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String register(SignUpDto signUpDto) {
+        log.info("Attempting to register new user with email: {}", signUpDto.getEmail());
         if (userRepository.existsByEmail(signUpDto.getEmail())) {
+            log.warn("Registration failed: Email already exists - {}", signUpDto.getEmail());
             throw new RuntimeException("Error: Email is already taken!");
         }
+
+        // --- START OF NEW DEBUGGING CODE ---
+        log.info("Searching for default role 'ROLE_GUEST'.");
+        List<Role> allRolesInDb = roleRepository.findAll();
+        // This line creates a string of all role names found, e.g., "ROLE_ADMIN, ROLE_GUEST"
+        String availableRoles = allRolesInDb.stream()
+                                            .map(Role::getName)
+                                            .collect(Collectors.joining(", "));
+        log.info("Available roles found in database: [{}]", availableRoles);
+        // --- END OF NEW DEBUGGING CODE ---
 
         User user = new User();
         user.setFirstName(signUpDto.getFirstName());
@@ -80,6 +95,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRoles(roles);
 
         userRepository.save(user);
+        log.info("Successfully registered user: {}", signUpDto.getEmail());
         return "User registered successfully!";
     }
 }
