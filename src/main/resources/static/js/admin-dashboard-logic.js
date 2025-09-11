@@ -1,7 +1,7 @@
 //======================================================================
 // INITIALIZATION & CONFIG
 //======================================================================
-const API_BASE_URL = 'https://applyease-6ell.onrender.com';
+const API_BASE_URL = '';
 let allApplications = [];
 let allUsers = [];
 let usersLoaded = false;
