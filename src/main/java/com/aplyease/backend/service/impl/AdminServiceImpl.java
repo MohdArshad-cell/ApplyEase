@@ -19,7 +19,11 @@ import com.aplyease.backend.repository.JobApplicationRepository;
 import com.aplyease.backend.repository.RoleRepository;
 import com.aplyease.backend.repository.UserRepository;
 import com.aplyease.backend.service.AdminService;
+
+
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -205,6 +209,7 @@ this.passwordEncoder = passwordEncoder;
     }
     
     @Override
+    @Transactional(readOnly = true)
     public AgentDetailAnalyticsDto getAgentDetailAnalytics(Long agentId) {
         // 1. Find the agent or throw an error
         User agent = userRepository.findById(agentId)
