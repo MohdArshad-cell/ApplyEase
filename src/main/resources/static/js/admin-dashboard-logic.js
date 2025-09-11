@@ -5,7 +5,9 @@ const API_BASE_URL = '';
 let allApplications = [];
 let allUsers = [];
 let usersLoaded = false;
-
+// Add these two lines at the top of your script
+let clientAppsChartInstance = null;
+let clientSuccessChartInstance = null;
 //======================================================================
 // HELPER & UTILITY FUNCTIONS
 //======================================================================
@@ -647,7 +649,6 @@ function closeAgentDrillDownModal() {
 let applicationsChartInstance = null;
 let successRateChartInstance = null;
 
-// REPLACE your old loadAgentAnalytics function with this
 async function loadEmployeeDashboard() {
     const analyticsPanel = document.getElementById('employee-panel');
     analyticsPanel.classList.add('loading'); // Optional: for a loading state
@@ -658,14 +659,14 @@ async function loadEmployeeDashboard() {
         
         const data = await response.json();
 
-        // Populate Stat Cards
-        document.getElementById('stats-payout').textContent = `$${data.totalPayout.toFixed(2)}`;
-        document.getElementById('stats-active-employees').textContent = `${data.activeEmployees} active employees`;
-        document.getElementById('stats-this-week').textContent = data.thisWeekSubmissions;
-        document.getElementById('stats-today').textContent = data.todaySubmissions;
-        document.getElementById('stats-daily-avg').textContent = data.dailyAverage.toFixed(1);
+        // --- FIX: Comment out these lines as the HTML elements do not exist ---
+        // document.getElementById('stats-payout').textContent = `$${data.totalPayout.toFixed(2)}`;
+        // document.getElementById('stats-active-employees').textContent = `${data.activeEmployees} active employees`;
+        // document.getElementById('stats-this-week').textContent = data.thisWeekSubmissions;
+        // document.getElementById('stats-today').textContent = data.todaySubmissions;
+        // document.getElementById('stats-daily-avg').textContent = data.dailyAverage.toFixed(1);
 
-        // Render Charts
+        // This part should now run without crashing
         renderApplicationsChart(data.performanceList);
         renderSuccessRateChart(data.performanceList);
 
@@ -728,6 +729,111 @@ function renderSuccessRateChart(performanceData) {
     });
 }
 
+async function loadClientAnalytics() {
+    const tableBody = document.getElementById('client-analytics-table-body');
+    showTableMessage(tableBody, 'Loading client analytics...', 5);
+    
+    // Get current filter values
+    const period = document.getElementById('client-period-filter').value;
+    const agentId = document.getElementById('client-agent-filter').value;
+
+    // Build the URL with query parameters
+    const url = `/api/admin/analytics/clients?period=${period}&agentId=${agentId}`;
+    
+    try {
+        const response = await fetchWithAuth(url);
+        if (!response.ok) throw new Error('Failed to load client analytics');
+        const analyticsData = await response.json();
+        
+        renderClientAnalyticsTable(analyticsData);
+        renderClientApplicationsChart(analyticsData);
+        renderClientSuccessChart(analyticsData);
+
+    } catch (error) {
+        console.error('Error loading client analytics:', error);
+        showTableMessage(tableBody, 'Failed to load client analytics.', 5);
+    }
+}
+
+function renderClientAnalyticsTable(analyticsData) {
+    const tableBody = document.getElementById('client-analytics-table-body');
+    tableBody.innerHTML = '';
+    if (!analyticsData || analyticsData.length === 0) {
+        showTableMessage(tableBody, 'No client data found for the selected filters.', 5);
+        return;
+    }
+
+    analyticsData.forEach((client, index) => {
+        const row = document.createElement('tr');
+        const rank = index + 1;
+        const successRate = client.successRate.toFixed(1);
+        let rateColorClass = successRate >= 50 ? 'high' : (successRate >= 20 ? 'medium' : 'low');
+
+        row.innerHTML = `
+            <td><div class="rank rank-${rank}">${rank}</div></td>
+            <td><div class="agent-info"><span class="name">${client.clientName}</span></div></td>
+            <td>${client.totalApplications}</td>
+            <td>${client.successfulPlacements}</td>
+            <td>
+                <div style="display: flex; align-items: center;">
+                    <div class="progress-bar">
+                        <div class="progress-bar-fill ${rateColorClass}" style="width: ${successRate}%;"></div>
+                    </div>
+                    <span class="success-rate-text">${successRate}%</span>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+
+function renderClientApplicationsChart(analyticsData) {
+    const ctx = document.getElementById('client-applications-chart')?.getContext('2d');
+    if (!ctx) return;
+    if (clientAppsChartInstance) clientAppsChartInstance.destroy();
+
+    const data = Array.isArray(analyticsData) ? analyticsData : [];
+    
+    clientAppsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(c => c.clientName),
+            datasets: [{
+                label: 'Total Applications',
+                data: data.map(c => c.totalApplications),
+                backgroundColor: 'rgba(0, 246, 255, 0.6)',
+                borderColor: 'rgba(0, 246, 255, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: { scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { display: false } } }
+    });
+}
+
+function renderClientSuccessChart(analyticsData) {
+    const ctx = document.getElementById('client-success-chart')?.getContext('2d');
+    if (!ctx) return;
+    if (clientSuccessChartInstance) clientSuccessChartInstance.destroy();
+
+    const data = Array.isArray(analyticsData) ? analyticsData : [];
+    
+    clientSuccessChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(c => c.clientName),
+            datasets: [{
+                label: 'Success Rate (%)',
+                data: data.map(c => c.successRate),
+                backgroundColor: 'rgba(37, 211, 102, 0.6)',
+                borderColor: 'rgba(37, 211, 102, 1)',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: { scales: { y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { color: 'rgba(255,255,255,0.1)' } } }, plugins: { legend: { display: false } } }
+    });
+}
 // In your initAdminDashboard function, UPDATE the tab switching logic
 // to call the new loadEmployeeDashboard function
 
@@ -737,24 +843,43 @@ function renderSuccessRateChart(performanceData) {
 function populateFilterDropdowns(users) {
     const agentFilter = document.getElementById('agent-filter');
     const clientFilter = document.getElementById('client-filter');
+    
+    // --- NEW CODE START ---
+    // Get the new agent filter from the Client Analytics tab
+    const clientAgentFilter = document.getElementById('client-agent-filter');
+    // --- NEW CODE END ---
 
-    if (!agentFilter || !clientFilter) return;
+    // This part for the "All Applications" tab remains the same
+    if (agentFilter) {
+        agentFilter.innerHTML = '<option value="">All Agents</option>';
+    }
+    if (clientFilter) {
+        clientFilter.innerHTML = '<option value="">All Clients</option>';
+    }
 
-    // Clear any existing options except the first "All" option
-    agentFilter.innerHTML = '<option value="">All Agents</option>';
-    clientFilter.innerHTML = '<option value="">All Clients</option>';
+    // --- NEW CODE START ---
+    // Clear the new dropdown as well
+    if (clientAgentFilter) {
+        clientAgentFilter.innerHTML = '<option value="">All Agents</option>';
+    }
+    // --- NEW CODE END ---
 
-    // Loop through all users and add them to the correct dropdown
+
+    // Loop through all users and add them to the correct dropdowns
     users.forEach(user => {
         const option = document.createElement('option');
         option.value = user.id;
         option.textContent = `${user.firstName} ${user.lastName}`;
 
         if (user.roles.includes('ROLE_AGENT')) {
-            agentFilter.appendChild(option.cloneNode(true));
+            if (agentFilter) agentFilter.appendChild(option.cloneNode(true));
+            // --- NEW CODE START ---
+            // Also add the agent to our new filter
+            if (clientAgentFilter) clientAgentFilter.appendChild(option.cloneNode(true));
+            // --- NEW CODE END ---
         }
         if (user.roles.includes('ROLE_CLIENT')) {
-            clientFilter.appendChild(option.cloneNode(true));
+            if(clientFilter) clientFilter.appendChild(option.cloneNode(true));
         }
     });
 }
@@ -836,9 +961,11 @@ function initAdminDashboard() {
     loadDashboardStats();
     loadAllApplications();
     loadAllUsers();
-    
-    // 2. Flag for Lazy Loading Analytics
-    let analyticsLoaded = false;
+
+    // 2. Flags for Lazy Loading Analytics
+    let analyticsTabLoaded = false;
+    let employeeDashboardLoaded = false;
+    let clientAnalyticsLoaded = false; // <-- Add this new flag
 
     // 3. Tab Switching & Lazy Loading Logic
     const tabs = document.querySelectorAll('.tab-link');
@@ -846,8 +973,6 @@ function initAdminDashboard() {
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // This is the click handler where the 'tab' variable exists.
-
             // Switch active tab visuals
             tabs.forEach(t => t.classList.remove('active'));
             panels.forEach(p => p.classList.remove('active'));
@@ -857,17 +982,19 @@ function initAdminDashboard() {
                 targetPanel.classList.add('active');
             }
 
-            // Lazy-load analytics data when that tab is clicked for the first time.
-            // This logic MUST be inside the click handler.
-            if (tab.dataset.tab === 'employee-panel' && !analyticsLoaded) {
+            // Lazy-load Employee Analytics data
+            if (tab.dataset.tab === 'employee-panel' && !analyticsTabLoaded) {
                 loadAgentAnalytics();
-                analyticsLoaded = true;
+                analyticsTabLoaded = true;
             }
-			
-			if (tab.dataset.tab === 'employee-panel' && !analyticsLoaded) {
-			            loadEmployeeAnalytics(); // Call the new, correct function
-			            analyticsLoaded = true;
-			        }
+            
+            // --- NEW CODE START ---
+            // Lazy-load Client Analytics data
+            if (tab.dataset.tab === 'client-panel' && !clientAnalyticsLoaded) {
+                loadClientAnalytics(); // This triggers the initial data load
+                clientAnalyticsLoaded = true;
+            }
+            // --- NEW CODE END ---
         });
     });
 
@@ -875,23 +1002,39 @@ function initAdminDashboard() {
     setupFilters();
     setupActionListeners();
 
-    // 5. Event Listeners for Modals
-    // (Assuming all your modal elements exist in the HTML)
-    const editForm = document.getElementById('edit-application-form');
-    const userForm = document.getElementById('user-form');
+    // 5. Employee Performance View Toggler (Radio Buttons)
+    const analyticsViewRadios = document.querySelectorAll('input[name="analytics-view"]');
+    const leaderboardView = document.getElementById('leaderboard-view');
+    const dashboardView = document.getElementById('dashboard-view');
+
+    analyticsViewRadios.forEach(radio => {
+        radio.addEventListener('change', (event) => {
+            if (event.target.value === 'leaderboard') {
+                leaderboardView.style.display = 'block';
+                dashboardView.style.display = 'none';
+            } else { // 'dashboard' view
+                leaderboardView.style.display = 'none';
+                dashboardView.style.display = 'block';
+                if (!employeeDashboardLoaded) {
+                    loadEmployeeDashboard();
+                    employeeDashboardLoaded = true;
+                }
+            }
+        });
+    });
     
+    // 6. Event Listeners for Modals and Filters
+    // (Modal listeners...)
     document.getElementById('close-modal-btn')?.addEventListener('click', closeEditModal);
     document.getElementById('cancel-edit-btn')?.addEventListener('click', closeEditModal);
-    if(editForm) editForm.addEventListener('submit', handleEditFormSubmit);
-
+    if(document.getElementById('edit-application-form')) document.getElementById('edit-application-form').addEventListener('submit', handleEditFormSubmit);
     document.getElementById('close-view-modal-btn')?.addEventListener('click', closeViewModal);
-    
     document.getElementById('close-user-modal-btn')?.addEventListener('click', closeUserModal);
     document.getElementById('cancel-user-btn')?.addEventListener('click', closeUserModal);
-    if(userForm) userForm.addEventListener('submit', handleUserFormSubmit);
-
+    if(document.getElementById('user-form')) document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
     document.getElementById('close-agent-report-btn')?.addEventListener('click', closeAgentReportModal);
     
+    // (Filter listeners...)
     const periodFilter = document.getElementById('analytics-period-filter');
     if (periodFilter) {
         periodFilter.addEventListener('change', () => {
@@ -900,6 +1043,13 @@ function initAdminDashboard() {
         });
     }
 	
+	const clientPeriodFilter = document.getElementById('client-period-filter');
+	const clientAgentFilter = document.getElementById('client-agent-filter');
+	if(clientPeriodFilter && clientAgentFilter) {
+	    clientPeriodFilter.addEventListener('change', loadClientAnalytics);
+	    clientAgentFilter.addEventListener('change', loadClientAnalytics);
+	}
 }
+
 // --- Run the App ---
 initAdminDashboard();

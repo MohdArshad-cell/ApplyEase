@@ -5,6 +5,7 @@ import com.aplyease.backend.dto.AdminDashboardStatsDto;
 import com.aplyease.backend.dto.AgentAnalyticsDto;
 import com.aplyease.backend.dto.AgentDetailAnalyticsDto;
 import com.aplyease.backend.dto.ApplicationUpdateRequestDto;
+import com.aplyease.backend.dto.ClientAnalyticsDto;
 import com.aplyease.backend.dto.EmployeeDashboardDto;
 import com.aplyease.backend.dto.StatusUpdateDto;
 import com.aplyease.backend.dto.UserCreateRequestDto;
@@ -125,5 +126,13 @@ public class AdminController {
  @GetMapping("/analytics/employee-dashboard")
  public ResponseEntity<EmployeeDashboardDto> getEmployeeDashboard() {
      return ResponseEntity.ok(adminService.getEmployeeDashboardAnalytics());
+ }
+ 
+ @GetMapping("/analytics/clients")
+ public ResponseEntity<List<ClientAnalyticsDto>> getClientAnalytics(
+         @RequestParam(required = false) String period,
+         @RequestParam(required = false) Long agentId) {
+     List<ClientAnalyticsDto> analytics = adminService.getClientAnalytics(period, agentId);
+     return ResponseEntity.ok(analytics);
  }
 }

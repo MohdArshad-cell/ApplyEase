@@ -9,9 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
     <style>
         /* === AplyEase Admin Dashboard Stylesheet (Refactored) === */
+        
 
 /* --- 1. Root Variables & Globals --- */
 :root {
@@ -325,6 +326,13 @@ body {
     display: none;
 }
 /* === Employee Analytics Leaderboard Styles === */
+.analytics-header {
+    display: flex;
+    align-items: center;      /* This is the key: it aligns everything vertically in the middle */
+    flex-wrap: wrap;          /* Allows items to wrap onto the next line on smaller screens */
+    gap: 1.5rem;              /* Creates a nice space between the items */
+    margin-bottom: 1.5rem;    /* Adds some space below the entire header */
+}
 .analytics-table {
     width: 100%;
     border-collapse: separate;
@@ -406,7 +414,7 @@ body {
 
 .charts-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr; /* This creates a single column */
     gap: 1.5rem;
     margin-top: 2rem;
 }
@@ -419,6 +427,81 @@ body {
     margin-top: 0;
     margin-bottom: 1.5rem;
     font-weight: 600;
+}
+
+/* === Modern Toggle Switch for Radio Buttons === */
+
+/* The container that holds the buttons */
+.view-toggle {
+    display: inline-flex;
+    background-color: rgba(10, 15, 30, 0.6); /* Matches your card background */
+    border: 1px solid var(--border-color);
+    border-radius: 999px; /* Makes it pill-shaped */
+    padding: 0.25rem;
+    overflow: hidden;
+}
+
+/* Hide the ugly default radio button */
+.view-toggle input[type="radio"] {
+    display: none;
+}
+
+/* Style for the labels, which are our new "buttons" */
+.view-toggle label {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between icon and text */
+}
+
+/* Style for the selected/active button */
+.view-toggle input[type="radio"]:checked + label {
+    background-color: var(--accent-cyan-transparent);
+    color: var(--text-primary);
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+}
+
+/* Subtle hover effect for unselected buttons */
+.view-toggle input[type="radio"]:not(:checked) + label:hover {
+    color: var(--text-primary);
+}
+
+.analytics-header select {
+    /* --- Appearance & Sizing --- */
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 160px;
+    padding: 0.75rem 2.5rem 0.75rem 1rem; /* Added right padding for arrow */
+    box-sizing: border-box;
+
+    /* --- Styling to Match Theme --- */
+    background-color: rgba(10, 15, 30, 0.6); /* Dark glass background */
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    /* --- Custom Dropdown Arrow --- */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+/* Style for the options inside the dropdown */
+
+.analytics-header  option {
+    background: #1a2035;
+    color: var(--text-primary);
 }
     </style>
 </head>
@@ -579,12 +662,12 @@ body {
     <div class="analytics-header">
         <h3>Employee Performance</h3>
         <div class="view-toggle">
-            <input type="radio" id="view-leaderboard" name="analytics-view" value="leaderboard" checked>
-            <label for="view-leaderboard"><i class="fa-solid fa-list-ol"></i> Leaderboard</label>
-            
-            <input type="radio" id="view-dashboard" name="analytics-view" value="dashboard">
-            <label for="view-dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</label>
-        </div>
+    <input type="radio" id="view-leaderboard" name="analytics-view" value="leaderboard" checked>
+    <label for="view-leaderboard"><i class="fa-solid fa-list-ol"></i> Leaderboard</label>
+    
+    <input type="radio" id="view-dashboard" name="analytics-view" value="dashboard">
+    <label for="view-dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</label>
+</div>
         <div class="table-filters">
             <select id="analytics-period-filter">
                 <option value="ALL_TIME">All Time</option>
@@ -629,9 +712,46 @@ body {
 
 
                 <div id="client-panel" class="content-section tab-panel glass-card">
-                    <h3>Client Analytics</h3>
-                    <p class="placeholder-text">Charts and data related to client success rates will be displayed here.</p>
-                </div>
+    <div class="analytics-header">
+        <h3>Client Performance</h3>
+        <select id="client-agent-filter" class="table-filters">
+            <option value="">All Agents</option>
+        </select>
+        <select id="client-period-filter" class="table-filters">
+            <option value="ALL_TIME">All Time</option>
+            <option value="LAST_30_DAYS">Last 30 Days</option>
+            <option value="LAST_7_DAYS">Last 7 Days</option>
+            <option value="THIS_YEAR">This Year</option>
+        </select>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th class="rank-col">#</th>
+                    <th>Client</th>
+                    <th>Total Applications</th>
+                    <th>Successful Placements</th>
+                    <th class="rate-col">Success Rate</th>
+                </tr>
+            </thead>
+            <tbody id="client-analytics-table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-container glass-card">
+            <h4>Applications per Client</h4>
+            <canvas id="client-applications-chart"></canvas>
+        </div>
+        <div class="chart-container glass-card">
+            <h4>Success Rate by Client</h4>
+            <canvas id="client-success-chart"></canvas>
+        </div>
+    </div>
+</div>
                 
             </div>
         </main>

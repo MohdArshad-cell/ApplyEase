@@ -7,6 +7,7 @@ import com.aplyease.backend.dto.AgentDetailAnalyticsDto;
 import com.aplyease.backend.dto.AgentPerformanceDto;
 import com.aplyease.backend.dto.ApplicationSummaryDto;
 import com.aplyease.backend.dto.ApplicationUpdateRequestDto;
+import com.aplyease.backend.dto.ClientAnalyticsDto;
 import com.aplyease.backend.dto.EmployeeDashboardDto;
 import com.aplyease.backend.dto.UserCreateRequestDto;
 import com.aplyease.backend.dto.UserDto;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +40,7 @@ public class AdminServiceImpl implements AdminService {
     private final JobApplicationRepository jobApplicationRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-
+    
     public AdminServiceImpl(UserRepository userRepository, 
             JobApplicationRepository jobApplicationRepository, 
             RoleRepository roleRepository, 
@@ -280,10 +282,43 @@ this.passwordEncoder = passwordEncoder;
         
         return dashboardData;
     }
+    @Override
+    public List<ClientAnalyticsDto> getClientAnalytics(String period, Long agentId) {
+        LocalDate startDate = null;
 
-    // You will also need to add this new method to your JobApplicationRepository
-    // long countByApplicationDateAfter(LocalDate startDate);
- // In AdminServiceImpl.java
+        // Determine the start date based on the period string
+        if (period != null && !period.equals("ALL_TIME")) {
+            switch (period) {
+                case "LAST_7_DAYS":
+                    startDate = LocalDate.now().minusDays(7);
+                    break;
+                case "LAST_30_DAYS":
+                    startDate = LocalDate.now().minusMonths(1);
+                    break;
+                case "THIS_YEAR":
+                    startDate = LocalDate.now().withDayOfYear(1);
+                    break;
+            }
+        }
+
+        // Call the new repository method with the calculated filters
+        List<ClientAnalyticsDto> analytics = jobApplicationRepository.getClientAnalytics(startDate, agentId);
+
+        // Calculate the success rate for each client
+        analytics.forEach(client -> {
+            if (client.getTotalApplications() > 0) {
+                double rate = ((double) client.getSuccessfulPlacements() / client.getTotalApplications()) * 100;
+                client.setSuccessRate(rate);
+            } else {
+                client.setSuccessRate(0.0);
+            }
+        });
+
+        // Sort the list by the highest success rate
+        analytics.sort(Comparator.comparing(ClientAnalyticsDto::getSuccessRate).reversed());
+
+        return analytics;
+    }
 
     // --- Helper Methods ---
 

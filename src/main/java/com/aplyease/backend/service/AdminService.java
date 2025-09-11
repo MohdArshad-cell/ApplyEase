@@ -5,6 +5,7 @@ import com.aplyease.backend.dto.AdminDashboardStatsDto;
 import com.aplyease.backend.dto.AgentAnalyticsDto;
 import com.aplyease.backend.dto.AgentDetailAnalyticsDto;
 import com.aplyease.backend.dto.ApplicationUpdateRequestDto;
+import com.aplyease.backend.dto.ClientAnalyticsDto;
 import com.aplyease.backend.dto.EmployeeDashboardDto;
 import com.aplyease.backend.dto.UserCreateRequestDto;
 import com.aplyease.backend.dto.UserDto;
@@ -24,4 +25,5 @@ public interface AdminService {
     List<AgentAnalyticsDto> getAgentAnalytics(String period);
     AgentDetailAnalyticsDto getAgentDetailAnalytics(Long agentId);
     EmployeeDashboardDto getEmployeeDashboardAnalytics();
+    List<ClientAnalyticsDto> getClientAnalytics(String period, Long agentId);
 }
